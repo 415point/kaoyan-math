@@ -1113,21 +1113,30 @@ function getDefaults() {
   };
 }
 
-async function loadState() {
-  // 1. Try Supabase cloud
-  try {
-    const { data, error } = await supabase.from('app_data').select('data').eq('id', 'main').single();
-    if (!error && data && data.data && Object.keys(data.data).length > 0) {
-      const merged = { ...getDefaults(), ...data.data };
-      if ((merged.plan808Version || 0) < PLAN808_VERSION) {
-        merged.plan808 = DEFAULT_PLAN_808;
-        merged.plan808Version = PLAN808_VERSION;
-      }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-      return merged;
-    }
-  } catch(e) { console.log('Supabase load, trying localStorage'); }
+function hasSupabase() {
+  return typeof supabase !== 'undefined' && supabase && supabase.from;
+}
 
+async function loadState() {
+  // 1. Try Supabase cloud (with 3s timeout)
+  if (hasSupabase()) {
+    try {
+      const result = await Promise.race([
+        supabase.from('app_data').select('data').eq('id', 'main').single(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
+      ]);
+      const { data, error } = result;
+      if (!error && data && data.data && Object.keys(data.data).length > 0) {
+        const merged = { ...getDefaults(), ...data.data };
+        if ((merged.plan808Version || 0) < PLAN808_VERSION) {
+          merged.plan808 = DEFAULT_PLAN_808;
+          merged.plan808Version = PLAN808_VERSION;
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+        return merged;
+      }
+    } catch(e) { console.log('Supabase不可用，使用本地存储'); }
+  }
   // 2. Fall back to localStorage
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) {
@@ -1137,8 +1146,10 @@ async function loadState() {
         local.plan808 = DEFAULT_PLAN_808;
         local.plan808Version = PLAN808_VERSION;
       }
-      // Migrate to Supabase
-      supabase.from('app_data').upsert({ id: 'main', data: local, updated_at: new Date().toISOString() }).then(() => {});
+      // Migrate to Supabase (fire and forget)
+      if (hasSupabase()) {
+        supabase.from('app_data').upsert({ id: 'main', data: local, updated_at: new Date().toISOString() }).then(() => {});
+      }
       return local;
     } catch(e) {}
   }
@@ -1149,7 +1160,9 @@ async function loadState() {
 
 function saveState(state) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  supabase.from('app_data').upsert({ id: 'main', data: state, updated_at: new Date().toISOString() }).then(() => {});
+  if (hasSupabase()) {
+    supabase.from('app_data').upsert({ id: 'main', data: state, updated_at: new Date().toISOString() }).then(() => {});
+  }
 }
 
 let state = null;
