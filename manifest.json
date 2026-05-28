@@ -1,0 +1,17 @@
+{
+  "name": "思明南路的路途",
+  "short_name": "思明南路",
+  "description": "考研备考追踪工具",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1b4f8a",
+  "theme_color": "#1b4f8a",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

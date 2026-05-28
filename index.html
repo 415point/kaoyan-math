@@ -1,0 +1,2577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="考研数学三备考追踪工具 - 厦门大学会计学 405+">
+<meta name="theme-color" content="#1b4f8a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="思明南路">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="manifest" href="manifest.json">
+<title>思明南路的路途</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --primary: #4f46e5; --primary-light: #e0e7ff; --success: #059669;
+  --warning: #d97706; --danger: #dc2626; --bg: #f8fafc;
+  --card: rgba(255,255,255,0.55); --text: #1e293b; --text-secondary: #64748b;
+  --border: #e2e8f0; --radius: 10px; --shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(rgba(0,0,0,.08), rgba(0,0,0,.08)), url('bg.jpg') center/cover no-repeat fixed; color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+/* Header */
+.header { background: rgba(27,79,138,.88); color: #fff; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.header .logo { display: flex; align-items: center; gap: 12px; }
+.header .logo-img { width: 34px; height: 34px; flex-shrink: 0; border-radius: 50%; object-fit: cover; }
+.header h1 { font-size: 22px; font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 8px rgba(0,0,0,.3); }
+.header .target { font-size: 13px; opacity: .85; }
+.header .target strong { color: #fbbf24; font-size: 16px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 0; background: #fff; border-bottom: 2px solid var(--border); padding: 0 24px; position: sticky; top: 56px; z-index: 99; justify-content: center; }
+.tab { padding: 14px 24px; border: none; background: none; cursor: pointer; font-size: 14px; font-weight: 500; color: #1e293b; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .2s; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.tab .badge { display: inline-block; background: var(--primary-light); color: var(--primary); font-size: 11px; padding: 1px 7px; border-radius: 10px; margin-left: 6px; font-weight: 600; }
+
+/* Main */
+.main { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+/* Cards */
+.card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; margin-bottom: 20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.card h3 { font-size: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+/* Stats Grid */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; }
+.stat-card { background: rgba(255,255,255,.2); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; text-align: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.stat-card .num { font-size: 36px; font-weight: 800; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.25); }
+.stat-card .label { font-size: 13px; color: rgba(255,255,255,.9); margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,.2); }
+
+/* Progress Bars */
+.progress-section { margin-bottom: 24px; }
+.progress-section h4 { font-size: 14px; margin-bottom: 12px; color: var(--text-secondary); }
+.progress-bar-wrap { background: #f1f5f9; border-radius: 6px; height: 10px; margin-bottom: 8px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 6px; transition: width .5s ease; }
+.progress-bar-fill.high { background: var(--primary); }
+.progress-bar-fill.mid { background: var(--warning); }
+.progress-bar-fill.low { background: var(--danger); }
+.progress-label { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+
+/* Tree */
+.tree { user-select: none; }
+.tree-node { margin-left: 0; }
+.tree-node .row { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 6px; cursor: pointer; transition: background .15s; }
+.tree-node .row:hover { background: #f8fafc; }
+.tree-node .arrow { width: 18px; text-align: center; font-size: 10px; color: var(--text-secondary); transition: transform .2s; flex-shrink: 0; }
+.tree-node .arrow.open { transform: rotate(90deg); }
+.tree-node .name { flex: 1; font-size: 14px; }
+.tree-node .name.section { font-weight: 600; }
+.tree-node .name.chapter { font-weight: 600; color: var(--primary); font-size: 15px; }
+.tree-node .children { margin-left: 24px; display: none; }
+.tree-node .children.open { display: block; }
+.status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.status-dot.none { background: #cbd5e1; }
+.status-dot.learning { background: #fbbf24; }
+.status-dot.mastered { background: #10b981; }
+.status-dot.weak { background: #ef4444; }
+.status-select { font-size: 12px; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border); cursor: pointer; background: #fff; flex-shrink: 0; }
+
+/* Buttons */
+.btn { padding: 8px 18px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 500; transition: all .2s; display: inline-flex; align-items: center; gap: 6px; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { opacity: .9; }
+.btn-outline { background: #fff; color: var(--primary); border: 1.5px solid var(--primary); }
+.btn-outline:hover { background: var(--primary-light); }
+.btn-danger { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
+.btn-danger:hover { background: #fee2e2; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+
+/* Forms */
+input, textarea, select { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 14px; font-family: inherit; transition: border-color .2s; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); }
+textarea { resize: vertical; min-height: 80px; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: var(--text-secondary); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* Table */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: #f8fafc; font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase; }
+tr:hover { background: #fafbfc; }
+
+/* Tags */
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+.tag-red { background: #fef2f2; color: #dc2626; }
+.tag-yellow { background: #fffbeb; color: #d97706; }
+.tag-green { background: #ecfdf5; color: #059669; }
+.tag-blue { background: #eff6ff; color: #2563eb; }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 200; display: flex; align-items: center; justify-content: center; }
+.modal { background: rgba(255,255,255,.95); border-radius: 12px; padding: 28px; max-width: 600px; width: 90%; max-height: 85vh; overflow-y: auto; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.modal h3 { margin-bottom: 20px; }
+
+/* Pace indicator */
+.pace-bar { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.pace-track { flex: 1; height: 8px; background: #f1f5f9; border-radius: 4px; position: relative; }
+.pace-fill { height: 100%; border-radius: 4px; }
+.pace-marker { position: absolute; top: -4px; width: 2px; height: 16px; background: var(--text); border-radius: 1px; }
+
+/* Chapter progress list */
+.chapter-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.chapter-item { background: #f8fafc; border-radius: 8px; padding: 14px; display: flex; align-items: center; gap: 12px; }
+.chapter-item .bar-wrap { flex: 1; height: 6px; background: #e2e8f0; border-radius: 3px; }
+.chapter-item .bar-fill { height: 100%; border-radius: 3px; background: var(--primary); transition: width .3s; }
+.chapter-item .pct { font-size: 13px; font-weight: 600; width: 40px; text-align: right; color: var(--text-secondary); }
+
+/* Streak Calendar */
+.streak-grid { display: flex; gap: 3px; flex-wrap: wrap; }
+.streak-cell { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+.streak-l0 { background: #f1f5f9; }
+.streak-l1 { background: #dbeafe; }
+.streak-l2 { background: #93c5fd; }
+.streak-l3 { background: #3b82f6; }
+.streak-l4 { background: #1d4ed8; }
+
+/* Lock Screen */
+.lock-overlay { position: fixed; inset: 0; background: #1b4f8a; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+.lock-card { background: #fff; border-radius: 16px; padding: 32px 28px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+.lock-card .lock-icon { font-size: 48px; margin-bottom: 12px; }
+.lock-card h2 { font-size: 20px; margin-bottom: 6px; color: #1e293b; }
+.lock-card .sub { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+.lock-card input { text-align: center; font-size: 24px; letter-spacing: 8px; padding: 12px; border-radius: 10px; border: 2px solid #e2e8f0; width: 100%; max-width: 220px; }
+.lock-card input:focus { border-color: #1b4f8a; outline: none; }
+.lock-card .lock-msg { font-size: 12px; color: #dc2626; margin-top: 8px; min-height: 18px; }
+.lock-card .lock-btn { margin-top: 16px; background: #1b4f8a; color: #fff; border: none; padding: 12px 40px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; }
+.lock-card .lock-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tabs { overflow-x: auto; padding: 0 12px; }
+  .tab { padding: 12px 14px; font-size: 13px; white-space: nowrap; }
+  .main { padding: 16px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-card .num { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <img src="logo.png" alt="厦门大学" class="logo-img">
+    <h1>思明南路的路途</h1>
+  </div>
+  <div class="target">目标: <strong>405+</strong> · 厦门大学会计学</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('dashboard')">总览</button>
+  <button class="tab" onclick="switchTab('knowledge')">知识点图谱</button>
+  <button class="tab" onclick="switchTab('wrong')">错题本 <span class="badge" id="wrong-count-badge">0</span></button>
+  <button class="tab" onclick="switchTab('video')">视频进度</button>
+  <button class="tab" onclick="switchTab('s808')">808专业课</button>
+  <button class="tab" onclick="switchTab('plan')">每日计划</button>
+</div>
+
+<div class="main" id="main-content"></div>
+
+<!-- Add Wrong Question Modal -->
+<div class="modal-overlay" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// ===========================
+// SUPABASE CONFIG
+// ===========================
+const SUPABASE_URL = 'https://vfqxvxldljmticrcjkzj.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmcXh2eGxkbGptdGljcmNqa3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4ODM5ODYsImV4cCI6MjA5NTQ1OTk4Nn0.19D_To8ckDGmxHdHloPogJdWu8ELEt10-qKgWBX9DKM';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ===========================
+// LOCK SCREEN (password gate)
+// ===========================
+const LOCK_KEY = 'kaoyan_lock_v1';
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_MS = 5 * 60 * 1000;
+
+function getLockData() {
+  try { return JSON.parse(localStorage.getItem(LOCK_KEY)) || {}; } catch(e) { return {}; }
+}
+function saveLockData(d) { localStorage.setItem(LOCK_KEY, JSON.stringify(d)); }
+
+async function hashPin(pin) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pin + 'kaoyan-salt');
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function renderLockScreen(isSetup, msg) {
+  const title = isSetup ? '设置访问密码' : '思明南路的路途';
+  const sub = isSetup ? '首次使用，请设置一个4-8位数字密码' : '请输入密码解锁';
+  const btn = isSetup ? '设置密码' : '解锁';
+  const overlay = document.createElement('div');
+  overlay.className = 'lock-overlay';
+  overlay.id = 'lock-overlay';
+  overlay.innerHTML = `<div class="lock-card">
+    <div class="lock-icon">🔐</div>
+    <h2>${title}</h2>
+    <div class="sub">${sub}</div>
+    <input type="password" id="lock-pin" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="输入数字密码" autofocus>
+    <div class="lock-msg" id="lock-msg">${msg||''}</div>
+    <button class="lock-btn" id="lock-btn">${btn}</button>
+  </div>`;
+  document.body.appendChild(overlay);
+  document.getElementById('lock-btn').addEventListener('click', () => handleLockSubmit(isSetup));
+  document.getElementById('lock-pin').addEventListener('keydown', (e) => { if(e.key==='Enter') handleLockSubmit(isSetup); });
+}
+
+async function handleLockSubmit(isSetup) {
+  const pin = document.getElementById('lock-pin').value.trim();
+  const msgEl = document.getElementById('lock-msg');
+  const btn = document.getElementById('lock-btn');
+
+  if (!pin || pin.length < 4 || !/^\d+$/.test(pin)) {
+    msgEl.textContent = '请输入4-8位数字密码';
+    return;
+  }
+
+  const lockData = getLockData();
+
+  // Check lockout
+  if (lockData.lockUntil && Date.now() < lockData.lockUntil) {
+    const remain = Math.ceil((lockData.lockUntil - Date.now()) / 60000);
+    msgEl.textContent = `密码错误次数过多，请${remain}分钟后再试`;
+    return;
+  }
+
+  const hash = await hashPin(pin);
+
+  if (isSetup) {
+    lockData.hash = hash;
+    lockData.attempts = 0;
+    saveLockData(lockData);
+    document.getElementById('lock-overlay').remove();
+  } else {
+    if (hash === lockData.hash) {
+      lockData.attempts = 0;
+      saveLockData(lockData);
+      document.getElementById('lock-overlay').remove();
+    } else {
+      lockData.attempts = (lockData.attempts || 0) + 1;
+      const remaining = MAX_ATTEMPTS - lockData.attempts;
+      if (lockData.attempts >= MAX_ATTEMPTS) {
+        lockData.lockUntil = Date.now() + LOCKOUT_MS;
+        lockData.attempts = 0;
+        saveLockData(lockData);
+        msgEl.textContent = '错误次数过多，已锁定5分钟';
+        btn.disabled = true;
+        setTimeout(() => { btn.disabled = false; msgEl.textContent = ''; }, LOCKOUT_MS);
+      } else {
+        saveLockData(lockData);
+        msgEl.textContent = `密码错误，还剩${remaining}次机会`;
+      }
+      document.getElementById('lock-pin').value = '';
+      document.getElementById('lock-pin').focus();
+    }
+  }
+}
+
+// Check if lock screen is needed
+(function checkLock() {
+  const lockData = getLockData();
+  if (!lockData.hash) {
+    renderLockScreen(true);
+  } else {
+    if (lockData.lockUntil && Date.now() < lockData.lockUntil) {
+      const remain = Math.ceil((lockData.lockUntil - Date.now()) / 60000);
+      renderLockScreen(false, `已锁定，请${remain}分钟后再试`);
+    } else {
+      renderLockScreen(false);
+    }
+  }
+})();
+
+// ===========================
+// DATA: 考研数学三完整知识点
+// ===========================
+const KNOWLEDGE_DATA = [
+  {
+    id: 'advanced', name: '高等数学', weight: 56,
+    chapters: [
+      {
+        id: 'adv-1', name: '函数、极限、连续',
+        points: [
+          '函数的概念及表示法',
+          '函数的有界性、单调性、周期性和奇偶性',
+          '复合函数、反函数、分段函数和隐函数',
+          '基本初等函数的性质及其图形',
+          '初等函数',
+          '函数关系的建立',
+          '数列极限与函数极限的定义及其性质',
+          '函数的左极限和右极限',
+          '无穷小量和无穷大量的概念及其关系',
+          '无穷小量的性质及无穷小量的比较',
+          '极限的四则运算',
+          '极限存在的两个准则：单调有界准则和夹逼准则',
+          '两个重要极限',
+          '函数连续的概念',
+          '函数间断点的类型',
+          '初等函数的连续性',
+          '闭区间上连续函数的性质'
+        ]
+      },
+      {
+        id: 'adv-2', name: '一元函数微分学',
+        points: [
+          '导数和微分的概念',
+          '导数的几何意义和经济意义',
+          '函数的可导性与连续性之间的关系',
+          '平面曲线的切线与法线',
+          '导数和微分的四则运算',
+          '基本初等函数的导数公式',
+          '复合函数、反函数和隐函数的微分法',
+          '高阶导数',
+          '一阶微分形式的不变性',
+          '微分中值定理（罗尔定理、拉格朗日中值定理、柯西中值定理）',
+          '洛必达(L\'Hospital)法则',
+          '函数单调性的判别',
+          '函数的极值',
+          '函数图形的凹凸性、拐点及渐近线',
+          '函数图形的描绘',
+          '函数的最大值与最小值'
+        ]
+      },
+      {
+        id: 'adv-3', name: '一元函数积分学',
+        points: [
+          '原函数和不定积分的概念',
+          '不定积分的基本性质',
+          '基本积分公式',
+          '定积分的概念和基本性质',
+          '定积分中值定理',
+          '积分上限的函数及其导数',
+          '牛顿-莱布尼茨(Newton-Leibniz)公式',
+          '不定积分和定积分的换元积分法',
+          '不定积分和定积分的分部积分法',
+          '有理函数、三角函数的有理式和简单无理函数的积分',
+          '反常（广义）积分',
+          '定积分的应用（平面图形面积、旋转体体积、经济应用）'
+        ]
+      },
+      {
+        id: 'adv-4', name: '多元函数微积分学',
+        points: [
+          '多元函数的概念',
+          '二元函数的几何意义',
+          '二元函数的极限与连续的概念',
+          '有界闭区域上二元连续函数的性质',
+          '多元函数的偏导数和全微分',
+          '多元复合函数的求导法则',
+          '隐函数的求导公式',
+          '二阶偏导数',
+          '多元函数的极值和条件极值',
+          '二重积分的概念与基本性质',
+          '二重积分的计算（直角坐标、极坐标）',
+          '无界区域上简单的反常二重积分'
+        ]
+      },
+      {
+        id: 'adv-5', name: '无穷级数',
+        points: [
+          '常数项级数的收敛与发散的概念',
+          '收敛级数的和的概念',
+          '级数的基本性质与收敛的必要条件',
+          '几何级数与p级数及其收敛性',
+          '正项级数收敛性的判别法（比较判别法、比值判别法、根值判别法）',
+          '任意项级数的绝对收敛与条件收敛',
+          '交错级数与莱布尼茨判别法',
+          '幂级数及其收敛半径、收敛区间和收敛域',
+          '幂级数的和函数',
+          '简单幂级数的和函数的求法',
+          '初等函数的幂级数展开式（e^x, sin x, cos x, ln(1+x), (1+x)^α）'
+        ]
+      },
+      {
+        id: 'adv-6', name: '常微分方程与差分方程',
+        points: [
+          '常微分方程的基本概念',
+          '变量可分离的微分方程',
+          '齐次微分方程',
+          '一阶线性微分方程',
+          '线性微分方程解的性质及解的结构定理',
+          '二阶常系数齐次线性微分方程',
+          '二阶常系数非齐次线性微分方程',
+          '差分与差分方程的概念',
+          '差分方程的通解与特解',
+          '一阶常系数线性差分方程'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'linear', name: '线性代数', weight: 22,
+    chapters: [
+      {
+        id: 'lin-1', name: '行列式',
+        points: [
+          '行列式的概念和基本性质',
+          '行列式按行（列）展开定理'
+        ]
+      },
+      {
+        id: 'lin-2', name: '矩阵',
+        points: [
+          '矩阵的概念',
+          '矩阵的线性运算（加法、数乘）',
+          '矩阵的乘法',
+          '方阵的幂',
+          '方阵乘积的行列式',
+          '矩阵的转置',
+          '逆矩阵的概念和性质',
+          '矩阵可逆的充分必要条件',
+          '伴随矩阵',
+          '矩阵的初等变换',
+          '初等矩阵',
+          '矩阵的秩',
+          '矩阵的等价',
+          '分块矩阵及其运算'
+        ]
+      },
+      {
+        id: 'lin-3', name: '向量',
+        points: [
+          '向量的概念',
+          '向量的线性组合和线性表示',
+          '向量组的线性相关与线性无关',
+          '向量组的极大线性无关组',
+          '等价向量组',
+          '向量组的秩',
+          '向量组的秩与矩阵的秩之间的关系',
+          '向量的内积',
+          '线性无关向量组的正交规范化方法（施密特正交化）'
+        ]
+      },
+      {
+        id: 'lin-4', name: '线性方程组',
+        points: [
+          '线性方程组的克拉默（Cramer）法则',
+          '齐次线性方程组有非零解的充分必要条件',
+          '非齐次线性方程组有解的充分必要条件',
+          '线性方程组解的性质和解的结构',
+          '齐次线性方程组的基础解系和通解',
+          '非齐次线性方程组的通解'
+        ]
+      },
+      {
+        id: 'lin-5', name: '矩阵的特征值和特征向量',
+        points: [
+          '矩阵的特征值和特征向量的概念',
+          '矩阵的特征值和特征向量的性质',
+          '相似矩阵的概念及性质',
+          '矩阵可相似对角化的充分必要条件',
+          '实对称矩阵的特征值',
+          '实对称矩阵的特征向量',
+          '实对称矩阵的相似对角矩阵'
+        ]
+      },
+      {
+        id: 'lin-6', name: '二次型',
+        points: [
+          '二次型及其矩阵表示',
+          '合同变换与合同矩阵',
+          '二次型的秩',
+          '惯性定理',
+          '二次型的标准形和规范形',
+          '用正交变换化二次型为标准形',
+          '用配方法化二次型为标准形',
+          '二次型及其矩阵的正定性'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'prob', name: '概率论与数理统计', weight: 22,
+    chapters: [
+      {
+        id: 'prob-1', name: '随机事件和概率',
+        points: [
+          '随机事件与样本空间',
+          '事件的关系与运算',
+          '完备事件组',
+          '概率的概念',
+          '概率的基本性质',
+          '古典型概率',
+          '几何型概率',
+          '条件概率',
+          '概率的基本公式（加法公式、乘法公式、全概率公式、贝叶斯公式）',
+          '事件的独立性',
+          '独立重复试验（伯努利概型）'
+        ]
+      },
+      {
+        id: 'prob-2', name: '随机变量及其分布',
+        points: [
+          '随机变量的概念',
+          '分布函数的概念及性质',
+          '离散型随机变量的概率分布',
+          '连续型随机变量的概率密度',
+          '常见随机变量的分布（0-1分布、二项分布、泊松分布、均匀分布、指数分布、正态分布）',
+          '随机变量函数的分布'
+        ]
+      },
+      {
+        id: 'prob-3', name: '多维随机变量及其分布',
+        points: [
+          '多维随机变量及其分布',
+          '二维离散型随机变量的概率分布、边缘分布和条件分布',
+          '二维连续型随机变量的概率密度、边缘概率密度和条件密度',
+          '随机变量的独立性和不相关性',
+          '常用二维随机变量的分布',
+          '两个及多个随机变量简单函数的分布'
+        ]
+      },
+      {
+        id: 'prob-4', name: '随机变量的数字特征',
+        points: [
+          '随机变量的数学期望（均值）、方差、标准差及其性质',
+          '随机变量函数的数学期望',
+          '矩（原点矩、中心矩）',
+          '协方差及其性质',
+          '相关系数及其性质'
+        ]
+      },
+      {
+        id: 'prob-5', name: '大数定律和中心极限定理',
+        points: [
+          '切比雪夫（Chebyshev）不等式',
+          '切比雪夫大数定律',
+          '伯努利（Bernoulli）大数定律',
+          '辛钦（Khinchin）大数定律',
+          '棣莫弗-拉普拉斯（De Moivre-Laplace）中心极限定理',
+          '列维-林德伯格（Levy-Lindberg）中心极限定理'
+        ]
+      },
+      {
+        id: 'prob-6', name: '数理统计的基本概念',
+        points: [
+          '总体、个体、简单随机样本',
+          '统计量',
+          '样本均值',
+          '样本方差和样本矩',
+          'χ²分布',
+          't分布',
+          'F分布',
+          '分位数',
+          '正态总体的常用抽样分布'
+        ]
+      },
+      {
+        id: 'prob-7', name: '参数估计',
+        points: [
+          '点估计的概念',
+          '估计量和估计值',
+          '矩估计法',
+          '最大似然估计法',
+          '估计量的评选标准（无偏性、有效性、一致性）',
+          '区间估计的概念',
+          '单个正态总体均值的置信区间',
+          '单个正态总体方差的置信区间'
+        ]
+      },
+      {
+        id: 'prob-8', name: '假设检验',
+        points: [
+          '显著性检验的基本思想',
+          '假设检验的两类错误',
+          '单个正态总体均值的假设检验',
+          '单个正态总体方差的假设检验'
+        ]
+      }
+    ]
+  }
+];
+
+// ===========================
+// DATA: 张宇基础30讲·高等数学 视频
+// ===========================
+const VIDEO_DATA = [
+  {ch:"导学",c:"基础30讲导学",d:7,ds:"7分"},
+  {ch:"零基础",c:"01. 基础知识结构 01",d:16,ds:"16分"},
+  {ch:"零基础",c:"02. 一、基本逻辑 02",d:42,ds:"42分"},
+  {ch:"零基础",c:"03. 一、基本逻辑 03",d:58,ds:"58分"},
+  {ch:"零基础",c:"04. 二、解析式的概念与运算 04",d:59,ds:"59分"},
+  {ch:"零基础",c:"05. 二、解析式的概念与运算 05",d:39,ds:"39分"},
+  {ch:"零基础",c:"06. 三、方程与不等式 06",d:52,ds:"52分"},
+  {ch:"零基础",c:"07. 三、方程与不等式 07",d:36,ds:"36分"},
+  {ch:"零基础",c:"08. 三、方程与不等式 08",d:69.0,ds:"1小时09分"},
+  {ch:"零基础",c:"09. 三、方程与不等式 09",d:72.0,ds:"1小时12分"},
+  {ch:"零基础",c:"10. 四、函数 10",d:33,ds:"33分"},
+  {ch:"零基础",c:"11. 四、函数 11",d:69.0,ds:"1小时09分"},
+  {ch:"零基础",c:"12. 四、函数 12",d:44,ds:"44分"},
+  {ch:"零基础",c:"13. 四、函数 13",d:62.0,ds:"1小时02分"},
+  {ch:"零基础",c:"14. 五、数列及其单调性 14",d:58,ds:"58分"},
+  {ch:"零基础",c:"15. 六、坐标系及其变换 15",d:72.0,ds:"1小时12分"},
+  {ch:"第 1 讲",c:"函数极限与连续基础知识结构 01",d:10,ds:"10分"},
+  {ch:"第 1 讲",c:"一、函数的概念与特性 02",d:51,ds:"51分"},
+  {ch:"第 1 讲",c:"一、函数的概念与特性 03",d:66.0,ds:"1小时06分"},
+  {ch:"第 1 讲",c:"二、函数的图像 04",d:62.0,ds:"1小时02分"},
+  {ch:"第 1 讲",c:"二、函数的图像 05",d:78.0,ds:"1小时18分"},
+  {ch:"第 1 讲",c:"三、函数极限的概念与特性 06",d:53,ds:"53分"},
+  {ch:"第 1 讲",c:"三、函数极限的概念与特性 07",d:65.0,ds:"1小时05分"},
+  {ch:"第 1 讲",c:"三、函数极限的概念与特性 08",d:30,ds:"30分"},
+  {ch:"第 1 讲",c:"三、函数极限的概念与特性 09",d:30,ds:"30分"},
+  {ch:"第 1 讲",c:"三、函数极限的概念与特性 10",d:57,ds:"57分"},
+  {ch:"第 1 讲",c:"三、函数极限的概念与特性 11",d:42,ds:"42分"},
+  {ch:"第 1 讲",c:"四、计算 12",d:104.0,ds:"1小时44分"},
+  {ch:"第 1 讲",c:"四、计算 13",d:68.0,ds:"1小时08分"},
+  {ch:"第 1 讲",c:"四、计算 14",d:48,ds:"48分"},
+  {ch:"第 1 讲",c:"五、函数的连续与间断 15",d:49,ds:"49分"},
+  {ch:"第 2 讲",c:"数列极限基础知识结构 01",d:5,ds:"5分"},
+  {ch:"第 2 讲",c:"基础内容精讲 02",d:67.0,ds:"1小时07分"},
+  {ch:"第 2 讲",c:"基础内容精讲 03",d:58,ds:"58分"},
+  {ch:"第 2 讲",c:"基础内容精讲 04",d:84.0,ds:"1小时24分"},
+  {ch:"第 2 讲",c:"基础内容精讲 05",d:83.0,ds:"1小时23分"},
+  {ch:"第 2 讲",c:"基础内容精讲 06",d:50,ds:"50分"},
+  {ch:"第 3 讲",c:"一元函数微分学的概念基础知识结构 01",d:5,ds:"5分"},
+  {ch:"第 3 讲",c:"基础内容精讲 02",d:62.0,ds:"1小时02分"},
+  {ch:"第 3 讲",c:"基础内容精讲 03",d:70.0,ds:"1小时10分"},
+  {ch:"第 3 讲",c:"基础内容精讲 04",d:58,ds:"58分"},
+  {ch:"第 4 讲",c:"一元函数微分学的计算基础知识结构 01",d:5,ds:"5分"},
+  {ch:"第 4 讲",c:"基础内容精讲 02",d:56,ds:"56分"},
+  {ch:"第 4 讲",c:"基础内容精讲 03",d:42,ds:"42分"},
+  {ch:"第 4 讲",c:"基础内容精讲 04",d:70.0,ds:"1小时10分"},
+  {ch:"第 5 讲",c:"一元函数微分学的应用（一）基础知识结构 01",d:10,ds:"10分"},
+  {ch:"第 5 讲",c:"一、极值的定义 02",d:16,ds:"16分"},
+  {ch:"第 5 讲",c:"二、单调性与极值的判别 03",d:64.0,ds:"1小时04分"},
+  {ch:"第 5 讲",c:"三、凹凸性与拐点的概念 04",d:10,ds:"10分"},
+  {ch:"第 5 讲",c:"四、凹凸性与拐点的判别 05",d:30,ds:"30分"},
+  {ch:"第 5 讲",c:"五、极值点与拐点的重要结论 06",d:28,ds:"28分"},
+  {ch:"第 5 讲",c:"六、渐近线 07",d:48,ds:"48分"},
+  {ch:"第 5 讲",c:"七、最值或取值范围 08",d:25,ds:"25分"},
+  {ch:"第 5 讲",c:"八、作函数图像 09",d:85.0,ds:"1小时25分"},
+  {ch:"第 5 讲",c:"九、曲率及曲率半径（仅数学一、数学二）10",d:4,ds:"4分"},
+  {ch:"第 6 讲",c:"一元函数微分学的应用（二）基础知识结构 01",d:7,ds:"7分"},
+  {ch:"第 6 讲",c:"一、中值定理 02",d:71.0,ds:"1小时11分"},
+  {ch:"第 6 讲",c:"一、中值定理 03",d:77.0,ds:"1小时17分"},
+  {ch:"第 6 讲",c:"一、中值定理 04",d:79.0,ds:"1小时19分"},
+  {ch:"第 6 讲",c:"二、微分等式 05",d:48,ds:"48分"},
+  {ch:"第 6 讲",c:"三、微分不等式 06",d:30,ds:"30分"},
+  {ch:"第 7 讲",c:"一元函数微分学的应用（三）基础知识结构 01",d:5,ds:"5分"},
+  {ch:"第 7 讲",c:"一、物理应用与相关变化率（仅数学一、数学二）02",d:11,ds:"11分"},
+  {ch:"第 7 讲",c:"二、复利与连续复利（仅数学三）03",d:19,ds:"19分"},
+  {ch:"第 7 讲",c:"三、导数的经济应用（仅数学三）04",d:40,ds:"40分"},
+  {ch:"第 8 讲",c:"一元函数积分学的概念与性质基础知识结构 01",d:4,ds:"4分"},
+  {ch:"第 8 讲",c:"一、不定积分 02",d:48,ds:"48分"},
+  {ch:"第 8 讲",c:"一、不定积分 03",d:69.0,ds:"1小时09分"},
+  {ch:"第 8 讲",c:"二、定积分 04",d:68.0,ds:"1小时08分"},
+  {ch:"第 8 讲",c:"二、定积分 05",d:79.0,ds:"1小时19分"},
+  {ch:"第 8 讲",c:"三、变限积分 06",d:50,ds:"50分"},
+  {ch:"第 8 讲",c:"四、反常积分 07",d:61.0,ds:"1小时01分"},
+  {ch:"第 8 讲",c:"四、反常积分 08",d:75.0,ds:"1小时15分"},
+  {ch:"第 9 讲",c:"一元函数积分学的计算基础知识结构 01",d:3,ds:"3分"},
+  {ch:"第 9 讲",c:"一、基本积分公式 02",d:17,ds:"17分"},
+  {ch:"第 9 讲",c:"二、不定积分的积分法 03",d:47,ds:"47分"},
+  {ch:"第 9 讲",c:"二、不定积分的积分法 04",d:83.0,ds:"1小时23分"},
+  {ch:"第 9 讲",c:"二、不定积分的积分法 05",d:52,ds:"52分"},
+  {ch:"第 9 讲",c:"三、定积分的计算 06",d:21,ds:"21分"},
+  {ch:"第 9 讲",c:"三、定积分的计算 07",d:69.0,ds:"1小时09分"},
+  {ch:"第 9 讲",c:"三、定积分的计算 08",d:26,ds:"26分"},
+  {ch:"第 9 讲",c:"四、变限积分的计算 09",d:58,ds:"58分"},
+  {ch:"第 9 讲",c:"五、反常积分的计算 10",d:47,ds:"47分"},
+  {ch:"第 10 讲",c:"一元函数积分学的应用（一）基础知识结构 01",d:5,ds:"5分"},
+  {ch:"第 10 讲",c:"基础内容精讲 02",d:55,ds:"55分"},
+  {ch:"第 10 讲",c:"基础内容精讲 03",d:60.0,ds:"1小时00分"},
+  {ch:"第 10 讲",c:"基础内容精讲（仅数学一、数学二）04",d:53,ds:"53分"},
+  {ch:"第 11 讲",c:"一元函数积分学的应用（二）基础知识结构 01",d:4,ds:"4分"},
+  {ch:"第 11 讲",c:"一、积分等式 02",d:71.0,ds:"1小时11分"},
+  {ch:"第 11 讲",c:"一、积分不等式 03",d:37,ds:"37分"},
+  {ch:"第 12 讲",c:"一元函数积分学的应用（三）基础知识结构 01",d:5,ds:"5分"},
+  {ch:"第 12 讲",c:"物理应用（仅数学一、数学二）02",d:29,ds:"29分"},
+  {ch:"第 12 讲",c:"二、古鲁金第一定理及其应用 & 三、古鲁金第二定理 03",d:42,ds:"42分"},
+  {ch:"第 12 讲",c:"经济应用（仅数学三）04",d:6,ds:"6分"},
+  {ch:"第 13 讲",c:"多元函数微分学基础知识结构 01",d:7,ds:"7分"},
+  {ch:"第 13 讲",c:"一、基础概念 02",d:77.0,ds:"1小时17分"},
+  {ch:"第 13 讲",c:"一、基础概念 03",d:78.0,ds:"1小时18分"},
+  {ch:"第 13 讲",c:"一、基础概念 04",d:23,ds:"23分"},
+  {ch:"第 13 讲",c:"二、多元函数微分法则 05",d:58,ds:"58分"},
+  {ch:"第 13 讲",c:"二、多元函数微分法则 06",d:72.0,ds:"1小时12分"},
+  {ch:"第 13 讲",c:"三、多元函数的极值与最值 07",d:61.0,ds:"1小时01分"},
+  {ch:"第 13 讲",c:"三、多元函数的极值与最值 08",d:44,ds:"44分"},
+  {ch:"第 14 讲",c:"二重积分基础知识结构 01",d:4,ds:"4分"},
+  {ch:"第 14 讲",c:"一、概念、性质与对称性 02",d:60.0,ds:"1小时00分"},
+  {ch:"第 14 讲",c:"一、概念、性质与对称性 03",d:46,ds:"46分"},
+  {ch:"第 14 讲",c:"二、计算 04",d:44,ds:"44分"},
+  {ch:"第 14 讲",c:"二、计算 05",d:37,ds:"37分"},
+  {ch:"第 14 讲",c:"二、计算 06",d:67.0,ds:"1小时07分"},
+  {ch:"第 14 讲",c:"三、平面区域 D 大观 07",d:31,ds:"31分"},
+  {ch:"第 15 讲",c:"微分方程基础知识结构 01",d:6,ds:"6分"},
+  {ch:"第 15 讲",c:"一、微分方程的概念 02",d:29,ds:"29分"},
+  {ch:"第 15 讲",c:"二、一阶微分方程的求解 03",d:36,ds:"36分"},
+  {ch:"第 15 讲",c:"二、一阶微分方程的求解 04",d:56,ds:"56分"},
+  {ch:"第 15 讲",c:"二、一阶微分方程的求解 05",d:23,ds:"23分"},
+  {ch:"第 15 讲",c:"二、一阶微分方程的求解 06",d:73.0,ds:"1小时13分"},
+  {ch:"第 15 讲",c:"三、高阶线性微分方程的求解 07",d:79.0,ds:"1小时19分"},
+  {ch:"第 15 讲",c:"三、高阶线性微分方程的求解 08",d:28,ds:"28分"},
+  {ch:"第 15 讲",c:"三、高阶线性微分方程的求解 09",d:13,ds:"13分"},
+  {ch:"第 15 讲",c:"四、微分方程的应用 10",d:19,ds:"19分"},
+  {ch:"第 15 讲",c:"五、微分方程的物理应用 11",d:17,ds:"17分"},
+  {ch:"第 15 讲",c:"六、一阶常系数线性差分方程 (仅数学三) 12",d:14,ds:"14分"},
+  {ch:"第 16 讲",c:"无穷级数（仅数一、数三）基础知识结构 01",d:6,ds:"6分"},
+  {ch:"第 16 讲",c:"一、常数项级数的概念与性质 02",d:60.0,ds:"1小时00分"},
+  {ch:"第 16 讲",c:"二、级数敛散性的判别方法 03",d:75.0,ds:"1小时15分"},
+  {ch:"第 16 讲",c:"二、级数敛散性的判别方法 04",d:59,ds:"59分"},
+  {ch:"第 16 讲",c:"二、级数敛散性的判别方法 05",d:46,ds:"46分"},
+  {ch:"第 16 讲",c:"二、级数敛散性的判别方法 06",d:86.0,ds:"1小时26分"},
+  {ch:"第 16 讲",c:"三、幂级数及其收敛域 07",d:70.0,ds:"1小时10分"},
+  {ch:"第 16 讲",c:"三、幂级数及其收敛域 08",d:58,ds:"58分"},
+  {ch:"第 16 讲",c:"四、幂级数求和函数 09",d:66.0,ds:"1小时06分"},
+  {ch:"第 16 讲",c:"四、幂级数求和函数 10",d:85.0,ds:"1小时25分"},
+  {ch:"第 16 讲",c:"五、函数展开成幂级数 11",d:28,ds:"28分"}
+];
+
+// ===========================
+// DATA: 808管理学与管理经济学 知识点
+// ===========================
+const DATA_808 = [
+  {
+    id: 'mgmt', name: '管理学', weight: 50,
+    chapters: [
+      {
+        id: 'mgmt-1', name: '管理与组织导论',
+        points: ['管理的定义与职能', '管理者的角色与技能', '组织与管理的关系', '管理学的学科性质']
+      },
+      {
+        id: 'mgmt-2', name: '管理思想史',
+        points: ['古典管理理论（泰勒、法约尔、韦伯）', '行为科学理论（霍桑实验、人际关系学说）', '定量管理理论', '现代管理理论丛林', '管理思想的发展趋势']
+      },
+      {
+        id: 'mgmt-3', name: '组织环境与组织文化',
+        points: ['组织环境的分类（一般环境与任务环境）', '环境不确定性矩阵', '组织文化的概念与维度', '组织文化的形成与传承']
+      },
+      {
+        id: 'mgmt-4', name: '全球化管理',
+        points: ['全球化管理的含义', '跨国公司的战略选择', '跨文化管理理论（霍夫斯泰德框架）', '国际人力资源管理']
+      },
+      {
+        id: 'mgmt-5', name: '道德与社会责任',
+        points: ['管理道德的定义', '影响道德决策的因素', '企业社会责任的层次', '利益相关者理论']
+      },
+      {
+        id: 'mgmt-6', name: '决策',
+        points: ['决策的类型', '理性决策模型', '有限理性与直觉决策', '群体决策的优缺点', '决策偏差与陷阱']
+      },
+      {
+        id: 'mgmt-7', name: '计划与目标',
+        points: ['计划的类型与层次', '目标管理（MBO）', '计划的权变因素', '项目管理与甘特图']
+      },
+      {
+        id: 'mgmt-8', name: '战略管理',
+        points: ['战略管理过程（分析→制定→实施→评估）', '竞争优势与核心竞争力', '波特五力模型', '三种基本竞争战略（成本领先、差异化、聚焦）', '公司层战略与业务层战略']
+      },
+      {
+        id: 'mgmt-9', name: '组织结构与设计',
+        points: ['组织结构的基本要素', '传统组织设计（职能、事业部、矩阵）', '现代组织设计（团队、虚拟、无边界）', '集权与分权', '权变因素对组织结构的影响']
+      },
+      {
+        id: 'mgmt-10', name: '人力资源管理',
+        points: ['人力资源规划', '招聘与甄选', '绩效评估的方法', '薪酬与福利设计', '培训与开发']
+      },
+      {
+        id: 'mgmt-11', name: '变革与创新管理',
+        points: ['组织变革的类型与动力', '变革阻力及其克服', '组织发展（OD）', '创新的类型与过程', '学习型组织']
+      },
+      {
+        id: 'mgmt-12', name: '个体行为基础',
+        points: ['态度与工作满意度', '人格类型（大五人格、MBTI）', '知觉与归因理论', '情绪与情绪智力', '组织公民行为']
+      },
+      {
+        id: 'mgmt-13', name: '群体与团队管理',
+        points: ['群体的类型与发展阶段', '群体规范与从众行为', '团队的类型与特征', '高效团队的建设', '群体决策技术（头脑风暴、德尔菲法）']
+      },
+      {
+        id: 'mgmt-14', name: '激励理论',
+        points: ['需要层次理论（马斯洛）', '双因素理论（赫茨伯格）', '期望理论（弗鲁姆）', '公平理论（亚当斯）', '强化理论', '目标设置理论', '激励理论的综合应用']
+      },
+      {
+        id: 'mgmt-15', name: '领导',
+        points: ['领导与管理的区别', '特质理论', '行为理论（俄亥俄州立、密歇根）', '权变理论（费德勒、路径-目标）', '现代领导理论（变革型、魅力型、服务型）']
+      },
+      {
+        id: 'mgmt-16', name: '沟通与人际技能',
+        points: ['沟通过程与类型', '组织沟通的障碍', '有效沟通的原则', '冲突管理策略', '谈判技巧']
+      },
+      {
+        id: 'mgmt-17', name: '控制基础',
+        points: ['控制的过程与类型', '前馈、同期与反馈控制', '控制的权变因素', '平衡计分卡', '信息控制系统']
+      },
+      {
+        id: 'mgmt-18', name: '运营与价值链管理',
+        points: ['运营管理的目标', '价值链管理', '质量管理（TQM、六西格玛）', '供应链管理', '精益生产']
+      }
+    ]
+  },
+  {
+    id: 'micro', name: '微观经济学', weight: 50,
+    chapters: [
+      {
+        id: 'micro-1', name: '需求、供给与均衡价格',
+        points: ['需求曲线与需求定律', '供给曲线与供给定律', '市场均衡与价格机制', '弹性理论（需求价格弹性、交叉弹性、收入弹性）', '供求分析的应用（税收、价格管制）']
+      },
+      {
+        id: 'micro-2', name: '消费者选择理论',
+        points: ['基数效用论与边际效用递减', '序数效用论与无差异曲线', '预算约束线', '消费者均衡（效用最大化）', '替代效应与收入效应', '需求曲线的推导']
+      },
+      {
+        id: 'micro-3', name: '生产理论',
+        points: ['生产函数的含义', '短期生产（边际报酬递减）', '长期生产（规模报酬）', '等产量线与等成本线', '最优要素组合', '生产扩展线']
+      },
+      {
+        id: 'micro-4', name: '成本理论',
+        points: ['成本的分类（机会成本、沉没成本）', '短期成本曲线（TC/AC/MC）', '长期成本曲线与规模经济', '范围经济与学习效应', '成本最小化']
+      },
+      {
+        id: 'micro-5', name: '完全竞争市场',
+        points: ['完全竞争市场的假设', '厂商利润最大化条件（P=MC）', '短期均衡与厂商供给曲线', '长期均衡与行业调整', '完全竞争市场的效率评价']
+      },
+      {
+        id: 'micro-6', name: '不完全竞争市场',
+        points: ['垄断市场的特征与均衡', '价格歧视', '垄断竞争市场的特征', '寡头垄断市场模型（古诺、斯塔克伯格、伯川德）', '卡特尔与价格领导', '博弈论基础（纳什均衡、囚徒困境）']
+      },
+      {
+        id: 'micro-7', name: '生产要素市场',
+        points: ['要素需求与边际产品价值', '劳动市场与工资决定', '资本市场与利率决定', '地租理论', '利润理论']
+      },
+      {
+        id: 'micro-8', name: '一般均衡与福利经济学',
+        points: ['一般均衡的含义', '帕累托最优与帕累托改进', '福利经济学第一定理与第二定理', '社会福利函数', '效率与公平的权衡']
+      },
+      {
+        id: 'micro-9', name: '市场失灵与微观经济政策',
+        points: ['外部性及其纠正', '公共物品与公共资源', '信息不对称（逆向选择、道德风险）', '政府失灵', '微观经济政策的效率分析']
+      }
+    ]
+  }
+];
+
+// ===========================
+// STATE MANAGEMENT
+// ===========================
+const STORAGE_KEY = 'kaoyan_math_v2';
+
+const DEFAULT_PLAN_808 = `【参考书目】
+管理学：格里芬《管理学精要》第9版 + 林志扬《管理学原理》
+微观经济学：高鸿业《西方经济学·微观部分》第7/8版
+习题：尹伯成《现代西方经济学习题指南(微观)》第9版 + 圣才笔记
+
+【数学视频进度】零基础 + 第1讲 ✅已完成
+━━━━━━━━━━━━━━━━━━━━
+📺 数学视频冲刺计划（5/21→5/31，6/1前完成高数全部）
+━━━━━━━━━━━━━━━━━━━━
+剩余：86个视频，约49h(1.5x) → 11天平均每天4.5h
+
+5/21(三)：导学 + 第2讲(约3.9h/1.5x)
+5/22(四)：第3讲 + 第4讲 + 第5讲前半01-05(约5.5h/1.5x)
+5/23(五)：第5讲后半06-10 + 第6讲(约5.6h/1.5x)
+5/24(六)：第7讲 + 第8讲前半01-04(约2.9h/1.5x) ★轻量日
+5/25(日)：第8讲后半05-08 + 第9讲前半01-05(约5.2h/1.5x)
+5/26(一)：第9讲后半06-10 + 第10讲 + 第11讲(约5.6h/1.5x)
+5/27(二)：第12讲 + 第13讲前半01-04(约3.0h/1.5x) ★轻量日
+5/28(三)：第13讲后半05-08 + 第14讲(约5.8h/1.5x)
+5/29(四)：第15讲前半01-06(约2.5h/1.5x) ★轻量日
+5/30(五)：第15讲后半07-12 + 第16讲前半01-05(约4.6h/1.5x)
+5/31(六)：第16讲后半06-11(约4.4h/1.5x)
+
+★ 有3天轻量日(2.5-3h)，可以用来追进度或休息
+★ 第16讲无穷级数提前做好心理准备
+★ 每听完一讲就去网站视频进度Tab打勾
+
+━━━━━━━━━━━━━━━━━━━━
+📖 专业课第一阶段（现在～6月底）
+━━━━━━━━━━━━━━━━━━━━
+目标：通读教材+做思维导图，不背诵
+进度：管理学18章 + 微观经济学9章 = 27章
+
+5/21-6/1期间（与视频冲刺并行）：
+- 每天管理学1章 + 微观经济学1章
+- 预计5/30前微观全部读完(9章)
+- 管理学读到第12章(共18章)
+- 每读完一章去网站808专业课Tab标记知识点状态
+
+5月剩余每日时间安排：
+  上午/下午：数学视频 4-6h
+  下午/晚上：管理学1章(1.5h) + 微观经济学1章(1.5h)
+  临睡前：回顾今天学的，更新网站进度
+
+━━━━━━━━━━━━━━━━━━━━
+【第二阶段：7～8月】一轮背诵 + 计算突破
+━━━━━━━━━━━━━━━━━━━━
+- 管理学：艾宾浩斯滚动背诵思维导图，暑期22章全部默写一遍
+- 微观：看郑炳强化班，刷尹伯成习题册第2-7章计算题
+
+【第三阶段：9～10月】真题 + 滚动背诵
+- 做近10年真题，808真题重复率较高
+- 管理学每天背一章+复习前一天，滚动到考前
+- 微观开始背诵圣才名词解释+思维导图
+
+【第四阶段：11月～考前】全真模拟 + 查漏补缺
+- 至少模考3次，练习3小时时间分配
+- 管理学积累3-5个案例用于论述题
+- 微观整理名词解释答题模板（定义+分类+特征）
+
+【高分原则】
+- 管理学靠背，经济学靠理解
+- 真题考点必须烂熟
+- 超纲趋势：要能用自己的话组织答案
+- 初试冲高分（目标415+），初复试占比6:4
+
+━━━━━━━━━━━━━━━━━━━━
+⚠️ 微观易忽略/超纲名词解释（尹伯成+圣才+历年真题整理）
+━━━━━━━━━━━━━━━━━━━━
+✅=高鸿业正文有 ⚠️=提到但未展开 🔴=高鸿业没有/极少
+
+【第7章：生产要素价格决定】
+✅ 引致需求 · 边际产品价值VMP · 边际收益产品MRP
+⚠️ 边际要素成本MFC与要素市场均衡
+⚠️ 劳动供给曲线向后弯曲（替代效应vs收入效应）
+⚠️ 经济租金 · 准租金 · 地租 — 三个概念易混，区分清楚
+⚠️ 洛伦兹曲线与基尼系数 — 808考过
+✅ 正常利润与超额利润 · 企业家才能
+
+【第8章：一般均衡与福利经济学】
+✅ 局部均衡vs一般均衡 · 帕累托最优 · 帕累托改进 ★高频
+⚠️ 埃奇沃斯盒状图 — 高鸿业有图，但要能写文字描述
+⚠️ 边际转换率MRT — 注意与MRS、MRTS的区别
+⚠️ 生产可能性曲线 · 效用可能性曲线
+🔴 社会福利函数三种形式：功利主义(边沁)、罗尔斯主义、折中主义
+🔴 阿罗不可能定理 — 高鸿业只在脚注提了，但808考过
+
+【第9章：博弈论初步】
+✅ 纳什均衡 ★高频 · 占优策略均衡 · 囚徒困境
+⚠️ 混合策略纳什均衡 — 概念本身，不考计算
+⚠️ 子博弈精炼纳什均衡 · 序贯博弈
+⚠️ 无限次重复博弈与默契合谋
+⚠️ 可信威胁与承诺
+
+【第10章：市场失灵与微观经济政策】
+✅ 外部性 · 科斯定理 · 逆向选择 · 道德风险 ★均高频
+⚠️ 消费的外部经济/生产的外部经济 — 808考过，高鸿业没写成标准名词
+⚠️ 庇古税 · 排污权交易
+⚠️ 公共物品四分类：纯公共物品/私人物品/公共资源/俱乐部物品
+⚠️ 搭便车问题 · 公地悲剧
+⚠️ 信号传递vs信号甄别 — 两个概念易混
+⚠️ 委托-代理问题与激励相容
+🔴 寻租行为 — 高鸿业提了一句，尹伯成有完整定义
+🔴 次优理论 — 高鸿业没有，尹伯成有，808超纲风险
+🔴 可竞争市场 — 尹伯成补充，808超纲风险
+
+【高鸿业没有但在同类院校/圣才/尹伯成中常考】
+🔴 显示性偏好弱公理 — 范里安有完整定义
+🔴 斯勒茨基替代效应vs希克斯替代效应 — 范里安区分方式
+🔴 期望效用与冯·诺依曼-摩根斯坦效用函数
+🔴 蛛网模型(收敛/发散/封闭) — 高鸿业有但在非核心章节
+⚠️ 补偿预算线 · 补偿变化vs等价变化
+
+【复习方法】
+1. ✅类概念：高鸿业正文能直接找到，必须写得出标准定义+分类+例子
+2. ⚠️类概念：从尹伯成/圣才找完整定义，补充到名词解释背诵清单
+3. 🔴类概念：从圣才名词解释汇总里背诵，至少能用自己的话写出定义
+4. 后4章每一章单独拉一个名词解释清单，确保没有遗漏
+5. 组合型名词(如\"要素供给的边际效用\")：拆成两部分理解后自己组织答案
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 6月全面冲刺计划（目标415+）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6月是基础阶段最后一个月，7月进入强化后节奏完全不同。
+这个月必须完成四科的\"地基\"，不留尾巴进暑假。
+
+【总体目标】
+数学：基础30讲视频100%看完 + 全部例题做完 + 1000题A组完成
+808：管理学18章+微观9章教材通读 + 思维导图全部画出
+英语：单词第二轮完成 + 长难句每日跟 + 真题阅读开始(05-12年)
+政治：有空就看徐涛视频（非硬性，7月开始也来得及）
+
+━━━━━━━━━━━━━━━━━━━━
+📐 数学（每天4-5h，最高优先级）
+━━━━━━━━━━━━━━━━━━━━
+6/1-6/5：收尾剩余视频（第13-16讲）+ 每天例题重做
+6/6-6/15：回刷第1-16讲所有例题（不看书，独立做）
+6/16-6/30：1000题A组刷完已学章节 + 错题整理
+
+★ 例题全部独立重做 > 赶1000题进度
+★ 每一道错题录入网站错题本，标注错误类型
+★ 6月底每章拿出一张白纸默写知识框架
+★ 如果视频进度落后，例题和1000题可以穿插进行
+
+具体要求：
+- 例题：不看答案独立做，卡壳超过5分钟再翻书
+- 1000题A组：目标是90%正确率，不是做完
+- 错题：当天错题第二天必须重做，做对才消掉
+- 框架笔记：每章学完白纸默写（概念→公式→题型→坑）
+
+━━━━━━━━━━━━━━━━━━━━
+📖 808专业课（每天2-3h）
+━━━━━━━━━━━━━━━━━━━━
+6/1-6/9：微观经济学9章全部读完 + 画思维导图（1章/天）
+6/10-6/27：管理学18章全部读完 + 画思维导图（1章/天）
+6/28-6/30：回顾所有思维导图，补遗漏 + 开始管理学课后题
+
+★ 先读完微观再读管理学（微观9天先解决，后面压力小）
+★ 读教材要画线做记号，不是翻一遍
+★ 每读完一章去网站808Tab标记知识点状态
+★ 思维导图手写或用XMind，包含：概念→分类→理论→评价
+★ 不背诵！这个阶段只求读完能用自己的话复述每章讲了什么
+
+具体要求：
+- 格里芬先读，林志扬后读（同一章两本书对照）
+- 每章读完后白纸写出该章的知识框架（不看书）
+- 微观经济学每章课后计算题要做（高鸿业课后题）
+- 不理解的标记出来，7月强化阶段解决
+
+━━━━━━━━━━━━━━━━━━━━
+🇬🇧 英语一（每天2h）
+━━━━━━━━━━━━━━━━━━━━
+单词（30min）：
+- 不背单词App第二轮，每天150+词，6月中旬前完成
+- 真题里遇到的生词单独记本子上，这是最重要的词库
+
+长难句（20min）：
+- 田静公众号\"每日一句\"每天跟
+- 要求：找出主谓宾→识别从句→自己能翻译
+
+真题阅读（1h，6/1开始）：
+- 每天1篇，从2005年真题开始
+- 18-20分钟做题→查每个生词→分析长难句→逐句翻译→对答案
+- 6月完成2005-2012年（共32篇，日均1篇足够）
+- 留2024/2025/2026三年真题不碰，11月模考用
+
+★ 只做真题，不做模拟题
+★ 一篇精读比刷十篇有用
+★ 错题分析：是单词不会？句子没读懂？还是逻辑判断错？
+★ 黄皮书（张剑）建议买一套
+
+━━━━━━━━━━━━━━━━━━━━
+📰 政治（0.5-1h，弹性安排）
+━━━━━━━━━━━━━━━━━━━━
+6月不是政治的硬性月份，但有余力可以：
+- B站搜徐涛强化课，每天看1节（当放松）
+- 看马原和史纲部分（需要理解，不是纯背）
+- 如果6月太忙，政治推到7月完全没问题
+
+━━━━━━━━━━━━━━━━━━━━
+⏰ 每日时间表
+━━━━━━━━━━━━━━━━━━━━
+08:00-09:00  英语单词+长难句
+09:00-12:00  数学（视频或例题，精力最好的时段）
+12:00-13:30  午饭+午休
+13:30-16:00  数学（做题+错题）
+16:00-18:00  808专业课（读教材+思维导图）
+18:00-19:00  晚饭+休息
+19:00-20:30  英语阅读精读1篇
+20:30-21:30  政治/回顾今天进度/更新网站打卡
+
+★ 每天至少有效学习8-9小时
+★ 周六晚上可休息，周日正常学习
+★ 每学50分钟休息10分钟（番茄钟节奏）
+★ 睡前花5分钟更新网站进度，保持打卡
+
+━━━━━━━━━━━━━━━━━━━━
+✅ 6月完成检查清单
+━━━━━━━━━━━━━━━━━━━━
+□ 数学基础30讲视频全部看完
+□ 数学全部例题独立重做一遍
+□ 数学1000题A组完成
+□ 数学错题全部录入网站并重做到全对
+□ 管理学18章教材读完+思维导图完成
+□ 微观经济学9章教材读完+思维导图完成
+□ 英语单词第二轮完成
+□ 英语真题阅读2005-2012全部精读完
+□ 长难句跟完30天
+□ 网站每日打卡不断`;
+
+const PLAN808_VERSION = 3;
+
+function getDefaults() {
+  return {
+    pointStatus: {},
+    pointStatus808: {},
+    wrongQuestions: [],
+    dailyRecords: {},
+    planSettings: { dailyHours: 4, examDate: '2026-12-20' },
+    videoCompleted: {},
+    plan808: DEFAULT_PLAN_808,
+    plan808Version: PLAN808_VERSION
+  };
+}
+
+async function loadState() {
+  // 1. Try Supabase cloud
+  try {
+    const { data, error } = await supabase.from('app_data').select('data').eq('id', 'main').single();
+    if (!error && data && data.data && Object.keys(data.data).length > 0) {
+      const merged = { ...getDefaults(), ...data.data };
+      if ((merged.plan808Version || 0) < PLAN808_VERSION) {
+        merged.plan808 = DEFAULT_PLAN_808;
+        merged.plan808Version = PLAN808_VERSION;
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      return merged;
+    }
+  } catch(e) { console.log('Supabase load, trying localStorage'); }
+
+  // 2. Fall back to localStorage
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    try {
+      const local = { ...getDefaults(), ...JSON.parse(raw) };
+      if ((local.plan808Version || 0) < PLAN808_VERSION) {
+        local.plan808 = DEFAULT_PLAN_808;
+        local.plan808Version = PLAN808_VERSION;
+      }
+      // Migrate to Supabase
+      supabase.from('app_data').upsert({ id: 'main', data: local, updated_at: new Date().toISOString() }).then(() => {});
+      return local;
+    } catch(e) {}
+  }
+
+  // 3. Use defaults
+  return getDefaults();
+}
+
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  supabase.from('app_data').upsert({ id: 'main', data: state, updated_at: new Date().toISOString() }).then(() => {});
+}
+
+let state = null;
+
+async function bootApp() {
+  state = await loadState();
+  saveState(state);
+  startApp();
+}
+
+// Generate unique IDs for each knowledge point
+function pointId(sectionId, chapterId, pointIndex) {
+  return chapterId + '-p' + pointIndex;
+}
+
+// Flatten all knowledge points into a map
+function buildPointMap() {
+  const map = {};
+  KNOWLEDGE_DATA.forEach(section => {
+    section.chapters.forEach(chapter => {
+      chapter.points.forEach((point, i) => {
+        const id = pointId(section.id, chapter.id, i);
+        map[id] = { section: section.name, sectionId: section.id, chapter: chapter.name, chapterId: chapter.id, point, index: i };
+      });
+    });
+  });
+  return map;
+}
+
+const POINT_MAP = buildPointMap();
+
+// Count total points
+function totalPoints() {
+  let count = 0;
+  KNOWLEDGE_DATA.forEach(s => s.chapters.forEach(c => count += c.points.length));
+  return count;
+}
+
+const TOTAL_POINTS = totalPoints();
+
+// ===========================
+// STATS HELPERS
+// ===========================
+function getSectionStats(sectionId) {
+  const section = KNOWLEDGE_DATA.find(s => s.id === sectionId);
+  let total = 0, mastered = 0, learning = 0, weak = 0;
+  section.chapters.forEach(ch => {
+    ch.points.forEach((_, i) => {
+      total++;
+      const status = state.pointStatus[pointId(sectionId, ch.id, i)] || 'none';
+      if (status === 'mastered') mastered++;
+      else if (status === 'learning') learning++;
+      else if (status === 'weak') weak++;
+    });
+  });
+  return { total, mastered, learning, weak, none: total - mastered - learning - weak };
+}
+
+function getChapterStats(sectionId, chapterId) {
+  const section = KNOWLEDGE_DATA.find(s => s.id === sectionId);
+  const chapter = section.chapters.find(c => c.id === chapterId);
+  let total = chapter.points.length, mastered = 0, learning = 0, weak = 0;
+  chapter.points.forEach((_, i) => {
+    const status = state.pointStatus[pointId(sectionId, chapterId, i)] || 'none';
+    if (status === 'mastered') mastered++;
+    else if (status === 'learning') learning++;
+    else if (status === 'weak') weak++;
+  });
+  return { total, mastered, learning, weak, none: total - mastered - learning - weak };
+}
+
+function getStreak() {
+  const today = new Date();
+  let current = 0;
+  let longest = 0;
+  let running = 0;
+
+  const d = new Date(today);
+  while (true) {
+    const ds = d.toISOString().slice(0, 10);
+    const rec = state.dailyRecords[ds];
+    if (rec && rec.hours > 0) { current++; } else { break; }
+    d.setDate(d.getDate() - 1);
+  }
+
+  const allDates = Object.keys(state.dailyRecords).sort();
+  for (let i = 0; i < allDates.length; i++) {
+    const rec = state.dailyRecords[allDates[i]];
+    if (rec && rec.hours > 0) {
+      running++;
+      if (running > longest) longest = running;
+    } else {
+      running = 0;
+    }
+    if (i > 0) {
+      const prev = new Date(allDates[i - 1]);
+      const curr = new Date(allDates[i]);
+      const diffDays = Math.round((curr - prev) / (1000 * 60 * 60 * 24));
+      if (diffDays > 1) running = rec && rec.hours > 0 ? 1 : 0;
+    }
+  }
+  if (running > longest) longest = running;
+  return { current, longest };
+}
+
+function hasCheckedInToday() {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const rec = state.dailyRecords[todayStr];
+  return rec && rec.hours > 0;
+}
+
+function getOverallStats() {
+  let total = 0, mastered = 0, learning = 0, weak = 0;
+  KNOWLEDGE_DATA.forEach(s => {
+    s.chapters.forEach(ch => {
+      ch.points.forEach((_, i) => {
+        total++;
+        const status = state.pointStatus[pointId(s.id, ch.id, i)] || 'none';
+        if (status === 'mastered') mastered++;
+        else if (status === 'learning') learning++;
+        else if (status === 'weak') weak++;
+      });
+    });
+  });
+  return { total, mastered, learning, weak, none: total - mastered - learning - weak };
+}
+
+// ===========================
+// 808 STATS HELPERS
+// ===========================
+function pointId808(sectionId, chapterId, pointIndex) {
+  return '808_' + chapterId + '-p' + pointIndex;
+}
+
+function get808OverallStats() {
+  let total = 0, mastered = 0, learning = 0, weak = 0;
+  DATA_808.forEach(s => {
+    s.chapters.forEach(ch => {
+      ch.points.forEach((_, i) => {
+        total++;
+        const status = state.pointStatus808[pointId808(s.id, ch.id, i)] || 'none';
+        if (status === 'mastered') mastered++;
+        else if (status === 'learning') learning++;
+        else if (status === 'weak') weak++;
+      });
+    });
+  });
+  return { total, mastered, learning, weak, none: total - mastered - learning - weak };
+}
+
+function get808SectionStats(sectionId) {
+  const section = DATA_808.find(s => s.id === sectionId);
+  let total = 0, mastered = 0, learning = 0, weak = 0;
+  section.chapters.forEach(ch => {
+    ch.points.forEach((_, i) => {
+      total++;
+      const status = state.pointStatus808[pointId808(sectionId, ch.id, i)] || 'none';
+      if (status === 'mastered') mastered++;
+      else if (status === 'learning') learning++;
+      else if (status === 'weak') weak++;
+    });
+  });
+  return { total, mastered, learning, weak, none: total - mastered - learning - weak };
+}
+
+function get808ChapterStats(sectionId, chapterId) {
+  const section = DATA_808.find(s => s.id === sectionId);
+  const chapter = section.chapters.find(c => c.id === chapterId);
+  let total = chapter.points.length, mastered = 0, learning = 0, weak = 0;
+  chapter.points.forEach((_, i) => {
+    const status = state.pointStatus808[pointId808(sectionId, chapterId, i)] || 'none';
+    if (status === 'mastered') mastered++;
+    else if (status === 'learning') learning++;
+    else if (status === 'weak') weak++;
+  });
+  return { total, mastered, learning, weak, none: total - mastered - learning - weak };
+}
+
+// ===========================
+// RENDER: DASHBOARD
+// ===========================
+function renderDashboard() {
+  const stats = getOverallStats();
+  const pct = stats.total > 0 ? Math.round((stats.mastered / stats.total) * 100) : 0;
+
+  // Days until exam
+  const examDate = new Date(state.planSettings.examDate);
+  const today = new Date();
+  const daysLeft = Math.max(0, Math.ceil((examDate - today) / (1000 * 60 * 60 * 24)));
+
+  // Calculate required daily pace
+  const pointsPerDay = daysLeft > 0 ? (stats.none + stats.learning + stats.weak) / daysLeft : 0;
+
+  // Today's record
+  const todayStr = today.toISOString().slice(0, 10);
+  const todayRecord = state.dailyRecords[todayStr] || { hours: 0, chapters: [] };
+
+  // Recent 7 days
+  const recentDays = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0, 10);
+    const rec = state.dailyRecords[ds] || { hours: 0, chapters: [] };
+    recentDays.push({ date: ds, label: d.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', weekday: 'short' }), hours: rec.hours });
+  }
+
+  // Wrong questions stats
+  const wrongTotal = state.wrongQuestions.length;
+  const wrongUnmastered = state.wrongQuestions.filter(q => !q.mastered).length;
+
+  let html = '';
+
+  const streak = getStreak();
+  const checkedIn = hasCheckedInToday();
+
+  // Stats cards
+  html += `<div class="stats-grid">
+    <div class="stat-card"><div class="num">${pct}%</div><div class="label">整体掌握率</div></div>
+    <div class="stat-card"><div class="num">${stats.mastered}</div><div class="label">已掌握 / ${stats.total} 个知识点</div></div>
+    <div class="stat-card"><div class="num">${daysLeft}</div><div class="label">距考试还有 (天)</div></div>
+    <div class="stat-card"><div class="num">${wrongUnmastered}</div><div class="label">未掌握错题</div></div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="num">${streak.current} 天</div><div class="label">当前连续打卡</div></div>
+    <div class="stat-card"><div class="num">${streak.longest} 天</div><div class="label">最长连续打卡</div></div>
+    <div class="stat-card" style="display:flex;align-items:center;justify-content:center">
+      <button class="btn ${checkedIn ? 'btn-outline' : 'btn-primary'}" style="font-size:14px" onclick="checkIn()">
+        ${checkedIn ? '今日已打卡' : '打卡签到'}
+      </button>
+    </div>
+  </div>`;
+
+  // Pace warning
+  if (pointsPerDay > 0 && stats.none > 0) {
+    const paceColor = pointsPerDay > 5 ? 'danger' : pointsPerDay > 3 ? 'warning' : 'success';
+    html += `<div class="card" style="border-left: 3px solid var(--${paceColor})">
+      <h3>进度分析</h3>
+      <p style="color:var(--text-secondary);font-size:14px">
+        剩余 ${stats.none + stats.learning + stats.weak} 个知识点未掌握，每天需掌握 <strong style="color:var(--${paceColor})">${pointsPerDay.toFixed(1)}</strong> 个知识点才能考前完成。
+        ${pointsPerDay > 5 ? '⚠️ 进度压力较大，建议增加学习时间！' : pointsPerDay > 3 ? '⚡ 进度适中，保持节奏。' : '✅ 进度良好，按部就班即可。'}
+      </p>
+    </div>`;
+  }
+
+  // Section progress
+  html += `<div class="card"><h3>各模块进度</h3>`;
+  KNOWLEDGE_DATA.forEach(section => {
+    const s = getSectionStats(section.id);
+    const pct = s.total > 0 ? Math.round((s.mastered / s.total) * 100) : 0;
+    html += `<div class="progress-section">
+      <div class="progress-label"><span>${section.name} <small style="color:var(--text-secondary)">(约占${section.weight}%)</small></span><span>${s.mastered}/${s.total} · ${pct}%</span></div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill ${pct >= 60 ? 'high' : pct >= 30 ? 'mid' : 'low'}" style="width:${pct}%"></div></div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  // 808 progress section
+  const s808 = get808OverallStats();
+  const pct808 = s808.total > 0 ? Math.round((s808.mastered / s808.total) * 100) : 0;
+  html += `<div class="card"><h3>808专业课进度</h3>`;
+  DATA_808.forEach(section => {
+    const s = get808SectionStats(section.id);
+    const spct = s.total > 0 ? Math.round((s.mastered / s.total) * 100) : 0;
+    html += `<div class="progress-section">
+      <div class="progress-label"><span>${section.name} <small style="color:var(--text-secondary)">(占${section.weight}%)</small></span><span>${s.mastered}/${s.total} · ${spct}%</span></div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill ${spct >= 60 ? 'high' : spct >= 30 ? 'mid' : 'low'}" style="width:${spct}%"></div></div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  // Chapter detail progress
+  html += `<div class="card"><h3>各章节详细进度</h3><div class="chapter-list">`;
+  KNOWLEDGE_DATA.forEach(section => {
+    section.chapters.forEach(ch => {
+      const cs = getChapterStats(section.id, ch.id);
+      const pct = cs.total > 0 ? Math.round((cs.mastered / cs.total) * 100) : 0;
+      const bgColor = pct >= 80 ? '#ecfdf5' : pct >= 40 ? '#fffbeb' : '#fef2f2';
+      const barColor = pct >= 80 ? '#059669' : pct >= 40 ? '#d97706' : '#dc2626';
+      html += `<div class="chapter-item" style="background:${bgColor}">
+        <span style="font-size:13px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${section.name}·${ch.name}">${section.name}·${ch.name}</span>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+        <span class="pct">${pct}%</span>
+      </div>`;
+    });
+  });
+  html += `</div></div>`;
+
+  // Recent 7-day study time
+  html += `<div class="card"><h3>近7天学习时长</h3>
+    <div style="display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:8px">`;
+  const maxHours = Math.max(1, ...recentDays.map(d => d.hours));
+  recentDays.forEach(d => {
+    const h = Math.round((d.hours / maxHours) * 100);
+    const isToday = d.date === todayStr;
+    html += `<div style="flex:1;text-align:center">
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px">${d.hours}h</div>
+      <div style="height:${Math.max(4, h)}px;background:${isToday ? 'var(--primary)' : '#cbd5e1'};border-radius:4px 4px 0 0;transition:height .3s"></div>
+      <div style="font-size:10px;color:var(--text-secondary);margin-top:4px">${d.label.slice(-3)}</div>
+    </div>`;
+  });
+  html += `</div></div>`;
+
+  // Streak calendar (last 28 days)
+  html += renderStreakCalendar();
+
+  // Data management
+  html += `<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3 style="margin:0">数据管理</h3>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" onclick="exportAllData()">导出备份</button>
+        <button class="btn btn-outline btn-sm" onclick="importAllData()">导入恢复</button>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--text-secondary);margin-top:8px">导出JSON文件实现电脑与手机间数据同步。导入前请先导出备份。</p>
+  </div>`;
+
+  // Quick actions
+  html += `<div class="card">
+    <h3>今日学习记录</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>今日学习时长（小时）</label>
+        <input type="number" id="today-hours" value="${todayRecord.hours}" min="0" max="24" step="0.5" onchange="updateTodayHours(this.value)">
+      </div>
+      <div style="display:flex;align-items:flex-end;padding-bottom:14px">
+        <span style="font-size:13px;color:var(--text-secondary)">目标: ${state.planSettings.dailyHours} 小时/天</span>
+      </div>
+    </div>
+  </div>`;
+
+  return html;
+}
+
+function renderStreakCalendar() {
+  const today = new Date();
+  let cells = '';
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0, 10);
+    const rec = state.dailyRecords[ds];
+    const hours = rec ? rec.hours : 0;
+    let level = 0;
+    if (hours > 0 && hours < 1) level = 1;
+    else if (hours >= 1 && hours < 2) level = 2;
+    else if (hours >= 2 && hours < 4) level = 3;
+    else if (hours >= 4) level = 4;
+    cells += `<span class="streak-cell streak-l${level}" title="${ds}: ${hours}h"></span>`;
+  }
+  return `<div class="card">
+    <h3>近28天打卡记录</h3>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <div class="streak-grid">${cells}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text-secondary)">
+      <span>少</span>
+      <span class="streak-cell streak-l0" style="display:inline-block;border-radius:3px"></span>
+      <span class="streak-cell streak-l1" style="display:inline-block;border-radius:3px"></span>
+      <span class="streak-cell streak-l2" style="display:inline-block;border-radius:3px"></span>
+      <span class="streak-cell streak-l3" style="display:inline-block;border-radius:3px"></span>
+      <span class="streak-cell streak-l4" style="display:inline-block;border-radius:3px"></span>
+      <span>多</span>
+    </div>
+  </div>`;
+}
+
+function checkIn() {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  if (!state.dailyRecords[todayStr]) state.dailyRecords[todayStr] = { hours: 0, chapters: [] };
+  state.dailyRecords[todayStr].hours = Math.max(state.dailyRecords[todayStr].hours, state.planSettings.dailyHours || 4);
+  saveState(state);
+  refresh();
+}
+
+// ===========================
+// SEARCH HELPERS
+// ===========================
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function highlightMatch(text, query) {
+  const escaped = escapeHtml(text);
+  const escapedQuery = escapeHtml(query);
+  const regex = new RegExp('(' + escapedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+  return escaped.replace(regex, '<mark style="background:#fde68a;color:#92400e;padding:1px 2px;border-radius:2px">$1</mark>');
+}
+
+let currentSearch = '';
+
+function onKnowledgeSearch(value) {
+  currentSearch = value;
+  refresh();
+}
+
+function clearSearch() {
+  currentSearch = '';
+  refresh();
+}
+
+// ===========================
+// RENDER: KNOWLEDGE MAP
+// ===========================
+function renderKnowledge(searchQuery) {
+  const query = (searchQuery || '').trim().toLowerCase();
+
+  let html = `<div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:200px;position:relative">
+      <input type="text" id="knowledge-search" placeholder="搜索知识点... (支持模糊搜索)" value="${escapeHtml(query)}" oninput="onKnowledgeSearch(this.value)" style="padding-left:36px">
+      <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text-secondary)">🔍</span>
+      ${query ? `<button style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-secondary);padding:2px 6px" onclick="clearSearch()" title="清除搜索">✕</button>` : ''}
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span style="font-size:13px;display:flex;align-items:center;gap:4px"><span class="status-dot none"></span> 未开始</span>
+      <span style="font-size:13px;display:flex;align-items:center;gap:4px"><span class="status-dot learning"></span> 学习中</span>
+      <span style="font-size:13px;display:flex;align-items:center;gap:4px"><span class="status-dot mastered"></span> 已掌握</span>
+      <span style="font-size:13px;display:flex;align-items:center;gap:4px"><span class="status-dot weak"></span> 薄弱</span>
+      <button class="btn btn-outline btn-sm" onclick="exportProgress()">导出进度</button>
+    </div>
+  </div>`;
+
+  if (query) {
+    // Search mode: flat filtered results grouped by chapter
+    const results = [];
+    KNOWLEDGE_DATA.forEach(section => {
+      section.chapters.forEach(chapter => {
+        chapter.points.forEach((point, i) => {
+          if (point.toLowerCase().includes(query)) {
+            results.push({
+              sectionName: section.name, sectionId: section.id,
+              chapterName: chapter.name, chapterId: chapter.id,
+              point, index: i,
+              pid: pointId(section.id, chapter.id, i),
+              status: state.pointStatus[pointId(section.id, chapter.id, i)] || 'none'
+            });
+          }
+        });
+      });
+    });
+
+    html += `<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:13px;color:var(--text-secondary)">
+          找到 <strong>${results.length}</strong> 个匹配知识点
+        </span>
+      </div>`;
+
+    if (results.length === 0) {
+      html += `<p style="color:var(--text-secondary);text-align:center;padding:40px">未找到匹配的知识点，试试其他关键词</p>`;
+    } else {
+      let lastChapter = '';
+      results.forEach(r => {
+        if (r.chapterId !== lastChapter) {
+          lastChapter = r.chapterId;
+          const cs = getChapterStats(r.sectionId, r.chapterId);
+          html += `<div style="padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:4px">
+            <span style="font-weight:600;font-size:13px">${r.sectionName} · ${r.chapterName}</span>
+            <span style="font-size:12px;color:var(--text-secondary);margin-left:8px">${cs.mastered}/${cs.total}</span>
+          </div>`;
+        }
+        const dotClass = r.status === 'mastered' ? 'mastered' : r.status === 'learning' ? 'learning' : r.status === 'weak' ? 'weak' : 'none';
+        const highlighted = highlightMatch(r.point, query);
+        html += `<div class="tree-node">
+          <div class="row">
+            <span style="width:18px;flex-shrink:0"></span>
+            <span class="status-dot-wrap" data-pid="${r.pid}"><span class="status-dot ${dotClass}"></span></span>
+            <span class="name" style="font-size:13px" title="${r.point}">${highlighted}</span>
+            <select class="status-select" onchange="updatePointStatus('${r.pid}', this.value)" onclick="event.stopPropagation()">
+              <option value="none" ${r.status==='none'?'selected':''}>未开始</option>
+              <option value="learning" ${r.status==='learning'?'selected':''}>学习中</option>
+              <option value="mastered" ${r.status==='mastered'?'selected':''}>已掌握</option>
+              <option value="weak" ${r.status==='weak'?'selected':''}>薄弱</option>
+            </select>
+          </div>
+        </div>`;
+      });
+    }
+    html += `</div>`;
+  } else {
+    // Normal tree mode
+    KNOWLEDGE_DATA.forEach(section => {
+      const ss = getSectionStats(section.id);
+      const pct = ss.total > 0 ? Math.round((ss.mastered / ss.total) * 100) : 0;
+      html += `<div class="card" style="padding:16px 20px">
+        <div class="tree-node">
+          <div class="row" onclick="toggleTree(this)" style="font-size:15px">
+            <span class="arrow open">▶</span>
+            <span class="name chapter">${section.name}</span>
+            <span style="font-size:12px;color:var(--text-secondary)">${ss.mastered}/${ss.total} · ${pct}%</span>
+            <span style="font-size:12px;color:var(--text-secondary)">(占${section.weight}%)</span>
+          </div>
+          <div class="children open">`;
+
+      section.chapters.forEach(chapter => {
+        const cs = getChapterStats(section.id, chapter.id);
+        html += `<div class="tree-node">
+          <div class="row" onclick="toggleTree(this)">
+            <span class="arrow">▶</span>
+            <span class="name section">${chapter.name}</span>
+            <span style="font-size:12px;color:var(--text-secondary)">${cs.mastered}/${cs.total}</span>
+            ${cs.weak > 0 ? `<span style="font-size:11px;color:var(--danger)">⚠${cs.weak}薄弱</span>` : ''}
+          </div>
+          <div class="children">`;
+
+        chapter.points.forEach((point, i) => {
+          const pid = pointId(section.id, chapter.id, i);
+          const status = state.pointStatus[pid] || 'none';
+          const dotClass = status === 'mastered' ? 'mastered' : status === 'learning' ? 'learning' : status === 'weak' ? 'weak' : 'none';
+          html += `<div class="tree-node">
+            <div class="row">
+              <span style="width:18px;flex-shrink:0"></span>
+              <span class="status-dot-wrap" data-pid="${pid}"><span class="status-dot ${dotClass}"></span></span>
+              <span class="name" style="font-size:13px" title="${point}">${point}</span>
+              <select class="status-select" onchange="updatePointStatus('${pid}', this.value)" onclick="event.stopPropagation()">
+                <option value="none" ${status==='none'?'selected':''}>未开始</option>
+                <option value="learning" ${status==='learning'?'selected':''}>学习中</option>
+                <option value="mastered" ${status==='mastered'?'selected':''}>已掌握</option>
+                <option value="weak" ${status==='weak'?'selected':''}>薄弱</option>
+              </select>
+            </div>
+          </div>`;
+        });
+
+        html += `</div></div>`;
+      });
+
+      html += `</div></div></div>`;
+    });
+  }
+
+  return html;
+}
+
+// ===========================
+// RENDER: 808 KNOWLEDGE
+// ===========================
+let currentSearch808 = '';
+
+function render808Knowledge(searchQuery) {
+  const query = (searchQuery || '').trim().toLowerCase();
+
+  let html = '';
+
+  // Study plan card (collapsible + editable)
+  html += `<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="togglePlan808()">
+      <h3 style="margin:0">808备考方案 <span style="font-size:12px;color:var(--text-secondary);font-weight:400" id="plan-808-indicator">（点击展开 / 可编辑）</span></h3>
+      <span style="font-size:12px;color:var(--text-secondary)" id="plan-808-arrow">▶</span>
+    </div>
+    <div id="plan-808-body" style="display:none;margin-top:12px">
+      <div id="plan-808-view" style="white-space:pre-wrap;font-size:14px;line-height:1.8;color:var(--text);background:#f8fafc;border-radius:8px;padding:16px">${escapeHtml(state.plan808)}</div>
+      <div id="plan-808-edit" style="display:none">
+        <textarea id="plan-808-textarea" style="min-height:400px;font-size:13px;line-height:1.8;margin-bottom:10px">${escapeHtml(state.plan808)}</textarea>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="savePlan808()">保存修改</button>
+          <button class="btn btn-outline btn-sm" onclick="cancelEditPlan808()">取消</button>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <button class="btn btn-outline btn-sm" id="plan-808-edit-btn" onclick="editPlan808()">编辑方案</button>
+      </div>
+    </div>
+  </div>`;
+
+  html += `<div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:200px;position:relative">
+      <input type="text" id="knowledge-808-search" placeholder="搜索808知识点..." value="${escapeHtml(query)}" oninput="on808Search(this.value)" style="padding-left:36px">
+      <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text-secondary)">🔍</span>
+      ${query ? `<button style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-secondary);padding:2px 6px" onclick="clear808Search()">✕</button>` : ''}
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span style="font-size:13px;display:flex;align-items:center;gap:4px"><span class="status-dot none"></span> 未开始</span>
+      <span style="font-size:13px;display:flex;align-items:center;gap:4px"><span class="status-dot learning"></span> 学习中</span>
+      <span style="font-size:13px;display:flex;align-items:center;gap:4px"><span class="status-dot mastered"></span> 已掌握</span>
+      <span style="font-size:13px;display:flex;align-items:center;gap:4px"><span class="status-dot weak"></span> 薄弱</span>
+    </div>
+  </div>`;
+
+  if (query) {
+    const results = [];
+    DATA_808.forEach(section => {
+      section.chapters.forEach(chapter => {
+        chapter.points.forEach((point, i) => {
+          if (point.toLowerCase().includes(query)) {
+            results.push({
+              sectionName: section.name, sectionId: section.id,
+              chapterName: chapter.name, chapterId: chapter.id,
+              point, index: i,
+              pid: pointId808(section.id, chapter.id, i),
+              status: state.pointStatus808[pointId808(section.id, chapter.id, i)] || 'none'
+            });
+          }
+        });
+      });
+    });
+    html += `<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:13px;color:var(--text-secondary)">找到 <strong>${results.length}</strong> 个匹配知识点</span>
+      </div>`;
+    if (results.length === 0) {
+      html += `<p style="color:var(--text-secondary);text-align:center;padding:40px">未找到匹配的知识点</p>`;
+    } else {
+      let lastChapter = '';
+      results.forEach(r => {
+        if (r.chapterId !== lastChapter) {
+          lastChapter = r.chapterId;
+          const cs = get808ChapterStats(r.sectionId, r.chapterId);
+          html += `<div style="padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:4px">
+            <span style="font-weight:600;font-size:13px">${r.sectionName} · ${r.chapterName}</span>
+            <span style="font-size:12px;color:var(--text-secondary);margin-left:8px">${cs.mastered}/${cs.total}</span>
+          </div>`;
+        }
+        const dotClass = r.status === 'mastered' ? 'mastered' : r.status === 'learning' ? 'learning' : r.status === 'weak' ? 'weak' : 'none';
+        const highlighted = highlightMatch(r.point, query);
+        html += `<div class="tree-node">
+          <div class="row">
+            <span style="width:18px;flex-shrink:0"></span>
+            <span class="status-dot-wrap" data-pid="${r.pid}"><span class="status-dot ${dotClass}"></span></span>
+            <span class="name" style="font-size:13px" title="${r.point}">${highlighted}</span>
+            <select class="status-select" onchange="update808PointStatus('${r.pid}', this.value)" onclick="event.stopPropagation()">
+              <option value="none" ${r.status==='none'?'selected':''}>未开始</option>
+              <option value="learning" ${r.status==='learning'?'selected':''}>学习中</option>
+              <option value="mastered" ${r.status==='mastered'?'selected':''}>已掌握</option>
+              <option value="weak" ${r.status==='weak'?'selected':''}>薄弱</option>
+            </select>
+          </div>
+        </div>`;
+      });
+    }
+    html += `</div>`;
+  } else {
+    DATA_808.forEach(section => {
+      const ss = get808SectionStats(section.id);
+      const pct = ss.total > 0 ? Math.round((ss.mastered / ss.total) * 100) : 0;
+      html += `<div class="card" style="padding:16px 20px">
+        <div class="tree-node">
+          <div class="row" onclick="toggleTree(this)" style="font-size:15px">
+            <span class="arrow open">▶</span>
+            <span class="name chapter">${section.name}</span>
+            <span style="font-size:12px;color:var(--text-secondary)">${ss.mastered}/${ss.total} · ${pct}%</span>
+            <span style="font-size:12px;color:var(--text-secondary)">(占${section.weight}%)</span>
+          </div>
+          <div class="children open">`;
+      section.chapters.forEach(chapter => {
+        const cs = get808ChapterStats(section.id, chapter.id);
+        html += `<div class="tree-node">
+          <div class="row" onclick="toggleTree(this)">
+            <span class="arrow">▶</span>
+            <span class="name section">${chapter.name}</span>
+            <span style="font-size:12px;color:var(--text-secondary)">${cs.mastered}/${cs.total}</span>
+            ${cs.weak > 0 ? `<span style="font-size:11px;color:var(--danger)">⚠${cs.weak}薄弱</span>` : ''}
+          </div>
+          <div class="children">`;
+        chapter.points.forEach((point, i) => {
+          const pid = pointId808(section.id, chapter.id, i);
+          const status = state.pointStatus808[pid] || 'none';
+          const dotClass = status === 'mastered' ? 'mastered' : status === 'learning' ? 'learning' : status === 'weak' ? 'weak' : 'none';
+          html += `<div class="tree-node">
+            <div class="row">
+              <span style="width:18px;flex-shrink:0"></span>
+              <span class="status-dot-wrap" data-pid="${pid}"><span class="status-dot ${dotClass}"></span></span>
+              <span class="name" style="font-size:13px" title="${point}">${point}</span>
+              <select class="status-select" onchange="update808PointStatus('${pid}', this.value)" onclick="event.stopPropagation()">
+                <option value="none" ${status==='none'?'selected':''}>未开始</option>
+                <option value="learning" ${status==='learning'?'selected':''}>学习中</option>
+                <option value="mastered" ${status==='mastered'?'selected':''}>已掌握</option>
+                <option value="weak" ${status==='weak'?'selected':''}>薄弱</option>
+              </select>
+            </div>
+          </div>`;
+        });
+        html += `</div></div>`;
+      });
+      html += `</div></div></div>`;
+    });
+  }
+  return html;
+}
+
+function on808Search(value) {
+  currentSearch808 = value;
+  refresh();
+}
+
+function clear808Search() {
+  currentSearch808 = '';
+  refresh();
+}
+
+function update808PointStatus(pid, status) {
+  state.pointStatus808[pid] = status;
+  if (status === 'none') delete state.pointStatus808[pid];
+  saveState(state);
+  const dot = document.querySelector(`.status-dot-wrap[data-pid="${pid}"] .status-dot`);
+  if (dot) {
+    dot.className = 'status-dot ' + (status === 'mastered' ? 'mastered' : status === 'learning' ? 'learning' : status === 'weak' ? 'weak' : 'none');
+  }
+}
+
+// 808 plan editing
+function togglePlan808() {
+  const body = document.getElementById('plan-808-body');
+  const arrow = document.getElementById('plan-808-arrow');
+  if (body && arrow) {
+    const isVisible = body.style.display !== 'none';
+    body.style.display = isVisible ? 'none' : 'block';
+    arrow.textContent = isVisible ? '▶' : '▼';
+  }
+}
+
+function editPlan808() {
+  document.getElementById('plan-808-view').style.display = 'none';
+  document.getElementById('plan-808-edit').style.display = 'block';
+  document.getElementById('plan-808-edit-btn').style.display = 'none';
+}
+
+function savePlan808() {
+  const textarea = document.getElementById('plan-808-textarea');
+  state.plan808 = textarea.value;
+  saveState(state);
+  document.getElementById('plan-808-view').textContent = state.plan808;
+  document.getElementById('plan-808-view').style.display = 'block';
+  document.getElementById('plan-808-edit').style.display = 'none';
+  document.getElementById('plan-808-edit-btn').style.display = 'inline-flex';
+}
+
+function cancelEditPlan808() {
+  document.getElementById('plan-808-textarea').value = state.plan808;
+  document.getElementById('plan-808-view').style.display = 'block';
+  document.getElementById('plan-808-edit').style.display = 'none';
+  document.getElementById('plan-808-edit-btn').style.display = 'inline-flex';
+}
+
+// ===========================
+// RENDER: WRONG QUESTIONS
+// ===========================
+function renderWrongQuestions() {
+  const filterError = new URLSearchParams(window.location.hash.slice(1)).get('errorType') || '';
+  let questions = state.wrongQuestions;
+  if (filterError) {
+    questions = questions.filter(q => q.errorType === filterError);
+  }
+
+  // Stats
+  const total = state.wrongQuestions.length;
+  const unmastered = state.wrongQuestions.filter(q => !q.mastered).length;
+  const mastered = total - unmastered;
+  const byType = {};
+  state.wrongQuestions.forEach(q => {
+    byType[q.errorType] = (byType[q.errorType] || 0) + 1;
+  });
+
+  let html = `<div class="stats-grid">
+    <div class="stat-card danger"><div class="num">${total}</div><div class="label">总错题数</div></div>
+    <div class="stat-card warning"><div class="num">${unmastered}</div><div class="label">待攻克</div></div>
+    <div class="stat-card success"><div class="num">${mastered}</div><div class="label">已攻克</div></div>
+  </div>`;
+
+  // Error type breakdown
+  html += `<div class="card">
+    <h3>错误类型分布</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${['概念不清','计算错误','审题失误','方法错误'].map(t => {
+        const count = byType[t] || 0;
+        const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+        const active = filterError === t;
+        return `<button class="btn ${active ? 'btn-primary' : 'btn-outline'} btn-sm" onclick="filterErrorType('${t}')">
+          ${t} <strong>${count}</strong> (${pct}%)
+        </button>`;
+      }).join('')}
+      ${filterError ? `<button class="btn btn-sm" onclick="filterErrorType('')" style="color:var(--text-secondary)">清除筛选</button>` : ''}
+    </div>
+  </div>`;
+
+  // Wrong questions list
+  html += `<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 style="margin:0">错题列表</h3>
+      <button class="btn btn-primary btn-sm" onclick="openAddWrongModal()">+ 添加错题</button>
+    </div>`;
+
+  if (questions.length === 0) {
+    html += `<p style="color:var(--text-secondary);text-align:center;padding:40px">暂无错题记录，开始做题吧！</p>`;
+  } else {
+    html += `<div class="table-wrap"><table>
+      <thead><tr>
+        <th>日期</th><th>章节</th><th>知识点</th><th>题目</th><th>错误类型</th><th>难度</th><th>复习次数</th><th>状态</th><th>操作</th>
+      </tr></thead><tbody>`;
+    questions.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(q => {
+      const difficultyStars = '⭐'.repeat(q.difficulty);
+      const statusTag = q.mastered ? '<span class="tag tag-green">已攻克</span>' : '<span class="tag tag-yellow">待复习</span>';
+      html += `<tr>
+        <td>${q.date}</td>
+        <td>${q.chapter}</td>
+        <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${q.point}">${q.point||'-'}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${q.question}">${q.question}</td>
+        <td><span class="tag tag-red">${q.errorType}</span></td>
+        <td>${difficultyStars}</td>
+        <td>${q.reviewCount || 0}</td>
+        <td>${statusTag}</td>
+        <td>
+          <button class="btn btn-outline btn-sm" onclick="openEditWrongModal('${q.id}')" style="margin-right:4px">查看</button>
+          <button class="btn btn-sm ${q.mastered ? 'btn-outline' : 'btn-primary'}" onclick="toggleWrongMastered('${q.id}')">${q.mastered ? '重新打开' : '已攻克'}</button>
+        </td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+  }
+  html += `</div>`;
+
+  return html;
+}
+
+// ===========================
+// RENDER: DAILY PLAN
+// ===========================
+function renderDailyPlan() {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayRecord = state.dailyRecords[todayStr] || { hours: 0, chapters: [] };
+
+  // Find weak points from wrong questions
+  const weakChapterIds = new Set();
+  state.wrongQuestions.filter(q => !q.mastered).forEach(q => {
+    weakChapterIds.add(q.chapterId);
+  });
+
+  // Find chapters sorted by priority (weak ones first, then unstarted)
+  const allChapters = [];
+  KNOWLEDGE_DATA.forEach(section => {
+    section.chapters.forEach(ch => {
+      const cs = getChapterStats(section.id, ch.id);
+      const priority = weakChapterIds.has(ch.id) ? 0 : cs.mastered === 0 ? 1 : cs.weak > 0 ? 2 : 3;
+      allChapters.push({
+        sectionName: section.name, chapterName: ch.name, sectionId: section.id, chapterId: ch.id,
+        stats: cs, priority,
+        pct: cs.total > 0 ? Math.round((cs.mastered / cs.total) * 100) : 0
+      });
+    });
+  });
+  allChapters.sort((a, b) => a.priority - b.priority || a.pct - b.pct);
+
+  let html = '';
+
+  // Settings
+  html += `<div class="card">
+    <h3>计划设置</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>每日目标学习时长（小时）</label>
+        <input type="number" id="plan-hours" value="${state.planSettings.dailyHours}" min="1" max="16" step="0.5" onchange="updatePlanSetting('dailyHours', this.value)">
+      </div>
+      <div class="form-group">
+        <label>考试日期</label>
+        <input type="date" id="plan-exam-date" value="${state.planSettings.examDate}" onchange="updatePlanSetting('examDate', this.value)">
+      </div>
+    </div>
+  </div>`;
+
+  // Today's plan
+  html += `<div class="card">
+    <h3>今日学习建议</h3>
+    <p style="color:var(--text-secondary);font-size:14px;margin-bottom:16px">
+      根据你的进度和薄弱点，以下是按优先级排列的学习建议：
+    </p>`;
+
+  const topChapters = allChapters.filter(c => c.pct < 100).slice(0, 6);
+  if (topChapters.length === 0) {
+    html += `<p style="color:var(--success);font-weight:500">所有章节已全部掌握，进入刷题阶段吧！</p>`;
+  } else {
+    html += `<table><thead><tr><th>优先级</th><th>模块</th><th>章节</th><th>当前进度</th><th>建议</th></tr></thead><tbody>`;
+    topChapters.forEach((ch, i) => {
+      const tag = ch.priority === 0 ? '<span class="tag tag-red">错题相关</span>' :
+                  ch.priority === 1 ? '<span class="tag tag-blue">未开始</span>' :
+                  ch.priority === 2 ? '<span class="tag tag-yellow">有薄弱点</span>' : '';
+      const suggestion = ch.pct === 0 ? '从零开始学习本章' :
+                         ch.stats.weak > 0 ? `重点攻克 ${ch.stats.weak} 个薄弱知识点` :
+                         `继续推进，剩余 ${ch.stats.none} 个知识点`;
+      html += `<tr>
+        <td><strong>#${i + 1}</strong></td>
+        <td>${ch.sectionName}</td>
+        <td>${ch.chapterName}</td>
+        <td>${ch.stats.mastered}/${ch.stats.total} (${ch.pct}%)</td>
+        <td>${tag} ${suggestion}</td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+  html += `</div>`;
+
+  // Study log
+  html += `<div class="card">
+    <h3>今日学习记录</h3>
+    <div class="form-row" style="margin-bottom:12px">
+      <div class="form-group">
+        <label>学习时长（小时）</label>
+        <input type="number" id="today-hours-plan" value="${todayRecord.hours}" min="0" max="24" step="0.5" onchange="updateTodayHours(this.value)">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>今日已完成的章节（可多选）</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+        ${allChapters.map(ch => {
+          const checked = todayRecord.chapters.includes(ch.chapterId);
+          return `<label style="font-size:12px;display:flex;align-items:center;gap:4px;padding:4px 8px;background:#f8fafc;border-radius:4px;cursor:pointer">
+            <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleTodayChapter('${ch.chapterId}', this.checked)" style="width:auto">
+            ${ch.sectionName}·${ch.chapterName}
+          </label>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>`;
+
+  return html;
+}
+
+// ===========================
+// RENDER: VIDEO TRACKER
+// ===========================
+function renderVideo() {
+  // Calculate chapter stats
+  const chapters = [];
+  const chapterMap = {};
+  VIDEO_DATA.forEach((v, i) => {
+    if (!chapterMap[v.ch]) {
+      chapterMap[v.ch] = { name: v.ch, totalMin: 0, totalVideos: 0, completedVideos: 0, completedMin: 0, videos: [] };
+      chapters.push(chapterMap[v.ch]);
+    }
+    const vid = 'v_' + i;
+    const done = state.videoCompleted[vid] || false;
+    chapterMap[v.ch].totalMin += v.d;
+    chapterMap[v.ch].totalVideos++;
+    if (done) {
+      chapterMap[v.ch].completedVideos++;
+      chapterMap[v.ch].completedMin += v.d;
+    }
+    chapterMap[v.ch].videos.push({ ...v, id: vid, index: i, done });
+  });
+
+  const totalMin = chapters.reduce((s, c) => s + c.totalMin, 0);
+  const completedMin = chapters.reduce((s, c) => s + c.completedMin, 0);
+  const totalVideos = VIDEO_DATA.length;
+  const completedVideos = Object.values(state.videoCompleted).filter(Boolean).length;
+  const pct = totalVideos > 0 ? Math.round((completedVideos / totalVideos) * 100) : 0;
+
+  // Estimated days
+  const remainingMin = totalMin - completedMin;
+  const dailyHours = state.planSettings.dailyHours || 4;
+  const estimatedDays = dailyHours > 0 ? Math.ceil(remainingMin / (dailyHours * 60)) : 0;
+
+  let html = '';
+
+  // Overall stats
+  html += `<div class="stats-grid">
+    <div class="stat-card primary"><div class="num">${pct}%</div><div class="label">视频完成率</div></div>
+    <div class="stat-card success"><div class="num">${completedVideos}</div><div class="label">已完成 / ${totalVideos} 个视频</div></div>
+    <div class="stat-card warning"><div class="num">${Math.round(completedMin / 60)}h${Math.round(completedMin % 60)}m</div><div class="label">已完成时长 / ${Math.round(totalMin / 60)}h${Math.round(totalMin % 60)}m</div></div>
+    <div class="stat-card ${estimatedDays < 14 ? 'danger' : estimatedDays < 25 ? 'warning' : 'success'}"><div class="num">${estimatedDays}</div><div class="label">预计还需 (天)</div></div>
+  </div>`;
+
+  // Overall progress bar
+  html += `<div class="card">
+    <div class="progress-label"><span>总进度</span><span>${pct}% (剩余 ${Math.round(remainingMin / 60)}小时${Math.round(remainingMin % 60)}分)</span></div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill ${pct >= 50 ? 'high' : pct >= 25 ? 'mid' : 'low'}" style="width:${pct}%"></div></div>
+    ${remainingMin > 0 ? `<p style="font-size:13px;color:var(--text-secondary);margin-top:8px">按每天${dailyHours}小时计算，还需约 <strong>${estimatedDays}</strong> 天完成全部视频</p>` : ''}
+  </div>`;
+
+  // Per-chapter accordion
+  html += `<div class="card"><h3>各讲进度</h3>`;
+
+  chapters.forEach(ch => {
+    const chPct = ch.totalVideos > 0 ? Math.round((ch.completedVideos / ch.totalVideos) * 100) : 0;
+    const barColor = chPct >= 80 ? '#059669' : chPct >= 40 ? '#d97706' : '#dc2626';
+    const chId = 'video-ch-' + ch.name.replace(/\s+/g, '_');
+
+    html += `<div class="tree-node" style="margin-bottom:8px">
+      <div class="row" onclick="toggleTree(this)" style="background:#f8fafc;border-radius:8px;padding:10px 12px">
+        <span class="arrow">▶</span>
+        <span style="font-weight:600;flex:1;font-size:14px">${ch.name}</span>
+        <span style="font-size:12px;color:var(--text-secondary);margin-right:8px">${ch.completedVideos}/${ch.totalVideos}个</span>
+        <span style="font-size:12px;color:var(--text-secondary);margin-right:8px">${Math.round(ch.totalMin)}分钟</span>
+        <span style="font-size:13px;font-weight:600;width:36px;text-align:right" class="${chPct >= 80 ? '' : chPct >= 40 ? '' : ''}" style="color:${barColor}">${chPct}%</span>
+      </div>
+      <div class="children">
+        <div style="padding:4px 0 4px 24px">`;
+
+    ch.videos.forEach(v => {
+      html += `<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:4px;font-size:13px;${v.done ? 'background:#f0fdf4' : ''}">
+        <input type="checkbox" ${v.done ? 'checked' : ''} onchange="toggleVideo('${v.id}', this.checked)" style="width:auto;cursor:pointer" id="${v.id}">
+        <label for="${v.id}" style="flex:1;cursor:pointer;${v.done ? 'color:var(--success);text-decoration:line-through' : ''}" title="${v.c}">${v.c}</label>
+        <span style="font-size:12px;color:var(--text-secondary);min-width:70px;text-align:right">${v.ds}</span>
+        ${v.c.includes('仅数学一') || v.c.includes('仅数学一、数学二') ? '<span class="tag tag-blue" style="font-size:10px">跳过</span>' : ''}
+      </div>`;
+    });
+
+    html += `</div></div></div>`;
+  });
+
+  html += `</div>`;
+
+  // Quick actions
+  html += `<div class="card">
+    <h3>快捷操作</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-outline btn-sm" onclick="markChapterVideos('all', true)">全部标为完成</button>
+      <button class="btn btn-outline btn-sm" onclick="markChapterVideos('all', false)">全部标为未完成</button>
+      <span style="color:var(--text-secondary);font-size:13px;display:flex;align-items:center;margin-left:8px">
+        <span class="tag tag-blue" style="font-size:10px;margin-right:4px">跳过</span> = 仅数学一/二的内容，数学三不需要学
+      </span>
+    </div>
+    <p style="font-size:12px;color:var(--text-secondary);margin-top:8px">
+      共 <strong>${VIDEO_DATA.filter(v => !v.c.includes('仅数学一') && !v.c.includes('仅数学一、数学二')).length}</strong> 个数学三需要看的视频，
+      约 <strong>${Math.round(VIDEO_DATA.filter(v => !v.c.includes('仅数学一') && !v.c.includes('仅数学一、数学二')).reduce((s, v) => s + v.d, 0) / 60)}</strong> 小时
+    </p>
+  </div>`;
+
+  return html;
+}
+
+function toggleVideo(vid, checked) {
+  state.videoCompleted[vid] = checked;
+  if (!checked) delete state.videoCompleted[vid];
+  saveState(state);
+  // Update the label style immediately
+  const checkbox = document.getElementById(vid);
+  if (checkbox) {
+    const label = checkbox.nextElementSibling;
+    if (label) {
+      if (checked) {
+        label.style.color = 'var(--success)';
+        label.style.textDecoration = 'line-through';
+        checkbox.parentElement.style.background = '#f0fdf4';
+      } else {
+        label.style.color = '';
+        label.style.textDecoration = '';
+        checkbox.parentElement.style.background = '';
+      }
+    }
+  }
+}
+
+function markChapterVideos(chapterName, done) {
+  VIDEO_DATA.forEach((v, i) => {
+    if (chapterName === 'all' || v.ch === chapterName) {
+      const vid = 'v_' + i;
+      state.videoCompleted[vid] = done;
+      if (!done) delete state.videoCompleted[vid];
+    }
+  });
+  saveState(state);
+  refresh();
+}
+
+// ===========================
+// MODAL: Add/Edit Wrong Question
+// ===========================
+function openAddWrongModal() {
+  const sections = [];
+  KNOWLEDGE_DATA.forEach(s => {
+    s.chapters.forEach(ch => {
+      ch.points.forEach((p, i) => {
+        sections.push({ sectionName: s.name, chapterName: ch.name, chapterId: ch.id, pointName: p, pointId: pointId(s.id, ch.id, i) });
+      });
+    });
+  });
+
+  document.getElementById('modal').style.display = 'flex';
+  document.getElementById('modal-content').innerHTML = `
+    <h3>添加错题</h3>
+    <div class="form-group">
+      <label>所属章节</label>
+      <select id="wq-chapter" onchange="updatePointSelect()">
+        ${(() => {
+          const seen = new Set();
+          let opts = '';
+          KNOWLEDGE_DATA.forEach(s => {
+            s.chapters.forEach(ch => {
+              const key = ch.id;
+              if (!seen.has(key)) {
+                seen.add(key);
+                opts += `<option value="${ch.id}">${s.name} · ${ch.name}</option>`;
+              }
+            });
+          });
+          return opts;
+        })()}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>关联知识点</label>
+      <select id="wq-point"><option value="">-- 选择知识点 --</option></select>
+    </div>
+    <div class="form-group">
+      <label>题目内容</label>
+      <textarea id="wq-question" placeholder="输入题目内容..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>你的答案</label>
+      <textarea id="wq-answer" placeholder="输入你做错的答案..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>正确解法 / 解析</label>
+      <textarea id="wq-analysis" placeholder="输入正确解法和分析..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>错误类型</label>
+        <select id="wq-error-type">
+          <option value="概念不清">概念不清</option>
+          <option value="计算错误">计算错误</option>
+          <option value="审题失误">审题失误</option>
+          <option value="方法错误">方法错误</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>难度 (1-5)</label>
+        <select id="wq-difficulty">
+          <option value="1">1 ⭐</option><option value="2">2 ⭐⭐</option>
+          <option value="3" selected>3 ⭐⭐⭐</option>
+          <option value="4">4 ⭐⭐⭐⭐</option><option value="5">5 ⭐⭐⭐⭐⭐</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-outline" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveWrongQuestion()">保存</button>
+    </div>
+  `;
+  updatePointSelect();
+}
+
+function updatePointSelect() {
+  const chapterId = document.getElementById('wq-chapter')?.value;
+  const select = document.getElementById('wq-point');
+  if (!select) return;
+  select.innerHTML = '<option value="">-- 选择知识点 --</option>';
+  if (!chapterId) return;
+  KNOWLEDGE_DATA.forEach(s => {
+    s.chapters.forEach(ch => {
+      if (ch.id === chapterId) {
+        ch.points.forEach((p, i) => {
+          select.innerHTML += `<option value="${pointId(s.id, ch.id, i)}">${p}</option>`;
+        });
+      }
+    });
+  });
+}
+
+function openEditWrongModal(qid) {
+  const q = state.wrongQuestions.find(w => w.id === qid);
+  if (!q) return;
+
+  document.getElementById('modal').style.display = 'flex';
+  document.getElementById('modal-content').innerHTML = `
+    <h3>错题详情</h3>
+    <div class="form-group"><label>日期</label><input value="${q.date}" disabled></div>
+    <div class="form-group"><label>章节</label><input value="${q.chapter}" disabled></div>
+    <div class="form-group"><label>知识点</label><input value="${q.point || '-'}" disabled></div>
+    <div class="form-group"><label>题目</label><textarea disabled>${q.question}</textarea></div>
+    <div class="form-group"><label>你的答案</label><textarea disabled>${q.answer || ''}</textarea></div>
+    <div class="form-group"><label>正确解法/解析</label><textarea disabled>${q.analysis || ''}</textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>错误类型</label><input value="${q.errorType}" disabled></div>
+      <div class="form-group"><label>难度</label><input value="${'⭐'.repeat(q.difficulty)} (${q.difficulty}/5)" disabled></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>复习次数</label><input value="${q.reviewCount || 0}" disabled></div>
+      <div class="form-group"><label>状态</label><input value="${q.mastered ? '已攻克' : '待复习'}" disabled></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-danger btn-sm" onclick="deleteWrongQuestion('${q.id}');closeModal()">删除</button>
+      <button class="btn btn-outline btn-sm" onclick="reviewWrongQuestion('${q.id}');closeModal()">复习+1</button>
+      <button class="btn btn-outline" onclick="closeModal()">关闭</button>
+    </div>
+  `;
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+function saveWrongQuestion() {
+  const chapterId = document.getElementById('wq-chapter').value;
+  const pointIdVal = document.getElementById('wq-point').value;
+  const question = document.getElementById('wq-question').value.trim();
+  const answer = document.getElementById('wq-answer').value.trim();
+  const analysis = document.getElementById('wq-analysis').value.trim();
+  const errorType = document.getElementById('wq-error-type').value;
+  const difficulty = parseInt(document.getElementById('wq-difficulty').value);
+
+  if (!question) { alert('请输入题目内容'); return; }
+
+  const chapterInfo = POINT_MAP[pointIdVal] || {};
+  const q = {
+    id: 'wq_' + Date.now(),
+    date: new Date().toISOString().slice(0, 10),
+    chapterId: chapterId,
+    chapter: chapterInfo.chapter || '',
+    point: chapterInfo.point || '',
+    pointId: pointIdVal || '',
+    question, answer, analysis, errorType, difficulty,
+    reviewCount: 0, mastered: false
+  };
+
+  state.wrongQuestions.push(q);
+  saveState(state);
+  closeModal();
+  refresh();
+}
+
+function deleteWrongQuestion(qid) {
+  state.wrongQuestions = state.wrongQuestions.filter(q => q.id !== qid);
+  saveState(state);
+  refresh();
+}
+
+function reviewWrongQuestion(qid) {
+  const q = state.wrongQuestions.find(w => w.id === qid);
+  if (q) { q.reviewCount = (q.reviewCount || 0) + 1; }
+  saveState(state);
+  refresh();
+}
+
+function toggleWrongMastered(qid) {
+  const q = state.wrongQuestions.find(w => w.id === qid);
+  if (q) { q.mastered = !q.mastered; }
+  saveState(state);
+  refresh();
+}
+
+function filterErrorType(type) {
+  window.location.hash = type ? 'errorType=' + type : '';
+  refresh();
+}
+
+// ===========================
+// ACTIONS
+// ===========================
+function updatePointStatus(pid, status) {
+  state.pointStatus[pid] = status;
+  if (status === 'none') delete state.pointStatus[pid];
+  saveState(state);
+  // Update the DOM directly for the status dot
+  const dot = document.querySelector(`.status-dot-wrap[data-pid="${pid}"] .status-dot`);
+  if (dot) {
+    dot.className = 'status-dot ' + (status === 'mastered' ? 'mastered' : status === 'learning' ? 'learning' : status === 'weak' ? 'weak' : 'none');
+  }
+}
+
+function updateTodayHours(hours) {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  if (!state.dailyRecords[todayStr]) state.dailyRecords[todayStr] = { hours: 0, chapters: [] };
+  state.dailyRecords[todayStr].hours = parseFloat(hours) || 0;
+  saveState(state);
+}
+
+function toggleTodayChapter(chapterId, checked) {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  if (!state.dailyRecords[todayStr]) state.dailyRecords[todayStr] = { hours: 0, chapters: [] };
+  if (checked) {
+    if (!state.dailyRecords[todayStr].chapters.includes(chapterId)) {
+      state.dailyRecords[todayStr].chapters.push(chapterId);
+    }
+  } else {
+    state.dailyRecords[todayStr].chapters = state.dailyRecords[todayStr].chapters.filter(c => c !== chapterId);
+  }
+  saveState(state);
+}
+
+function updatePlanSetting(key, value) {
+  if (key === 'dailyHours') state.planSettings.dailyHours = parseFloat(value) || 4;
+  else if (key === 'examDate') state.planSettings.examDate = value;
+  saveState(state);
+}
+
+function exportAllData() {
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'kaoyan_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importAllData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!data.pointStatus && !data.wrongQuestions && !data.dailyRecords) {
+          alert('文件格式不正确，请选择 kaoyan_backup_*.json');
+          return;
+        }
+        if (confirm('导入将覆盖当前所有数据（进度、错题、打卡记录），确定继续？')) {
+          Object.assign(state, data);
+          saveState(state);
+          refresh();
+          alert('数据导入成功！');
+        }
+      } catch(e) {
+        alert('文件损坏或格式不正确');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function exportProgress() {
+  const stats = getOverallStats();
+  let text = '=== 考研数学三 进度报告 ===\n\n';
+  text += `总体: ${stats.mastered}/${stats.total} 已掌握 (${Math.round(stats.mastered/stats.total*100)}%)\n\n`;
+  KNOWLEDGE_DATA.forEach(section => {
+    const s = getSectionStats(section.id);
+    text += `${section.name} (占${section.weight}%): ${s.mastered}/${s.total}\n`;
+    section.chapters.forEach(ch => {
+      const cs = getChapterStats(section.id, ch.id);
+      text += `  ${ch.name}: ${cs.mastered}/${cs.total}`;
+      if (cs.weak > 0) text += ` ⚠薄弱:${cs.weak}`;
+      text += '\n';
+    });
+    text += '\n';
+  });
+  text += `\n错题总数: ${state.wrongQuestions.length} | 未攻克: ${state.wrongQuestions.filter(q=>!q.mastered).length}`;
+
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '考研数学进度_' + new Date().toISOString().slice(0,10) + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===========================
+// TREE TOGGLE
+// ===========================
+function toggleTree(row) {
+  const arrow = row.querySelector('.arrow');
+  const children = row.parentElement.querySelector('.children');
+  if (arrow) arrow.classList.toggle('open');
+  if (children) children.classList.toggle('open');
+}
+
+// ===========================
+// TAB SWITCHING
+// ===========================
+let currentTab = 'dashboard';
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const tabNames = ['dashboard','knowledge','wrong','video','s808','plan'];
+  document.querySelectorAll('.tab').forEach((t, i) => { if (tabNames[i] === tab) t.classList.add('active'); });
+  refresh();
+}
+
+function refresh() {
+  const main = document.getElementById('main-content');
+  switch (currentTab) {
+    case 'dashboard': main.innerHTML = renderDashboard(); break;
+    case 'knowledge': main.innerHTML = renderKnowledge(currentSearch); break;
+    case 'wrong': main.innerHTML = renderWrongQuestions(); break;
+    case 'video': main.innerHTML = renderVideo(); break;
+    case 's808': main.innerHTML = render808Knowledge(currentSearch808); break;
+    case 'plan': main.innerHTML = renderDailyPlan(); break;
+  }
+  // Update badge
+  const badge = document.getElementById('wrong-count-badge');
+  if (badge) {
+    const count = state.wrongQuestions.filter(q => !q.mastered).length;
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'inline-block' : 'none';
+  }
+}
+
+// ===========================
+// INIT
+// ===========================
+function init() {
+  // Check URL hash for direct tab access
+  const hash = window.location.hash.slice(1);
+  if (hash === 'wrong') currentTab = 'wrong';
+  else if (hash === 'knowledge') currentTab = 'knowledge';
+  else if (hash === 'video') currentTab = 'video';
+  else if (hash === 's808') currentTab = 's808';
+  else if (hash === 'plan') currentTab = 'plan';
+
+  // Activate correct tab
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    const tabNames2 = ['dashboard','knowledge','wrong','video','s808','plan'];
+    if (tabNames2[i] === currentTab) t.classList.add('active');
+  });
+
+  refresh();
+}
+
+function startApp() {
+  init();
+  // Auto-save on page unload
+  window.addEventListener('beforeunload', () => saveState(state));
+}
+
+console.log('考研数学三备考工具已就绪');
+console.log(`知识点总数: ${TOTAL_POINTS}`);
+console.log(`错题数: ${state.wrongQuestions.length}`);
+console.log('目标: 厦门大学会计学学硕 405+');
+
+// Boot after all functions defined
+bootApp();
+</script>
+</body>
+</html>
