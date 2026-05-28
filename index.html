@@ -187,14 +187,18 @@ tr:hover { background: #fafbfc; }
   <div class="modal" id="modal-content"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 // ===========================
 // SUPABASE CONFIG
 // ===========================
 const SUPABASE_URL = 'https://vfqxvxldljmticrcjkzj.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmcXh2eGxkbGptdGljcmNqa3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4ODM5ODYsImV4cCI6MjA5NTQ1OTk4Nn0.19D_To8ckDGmxHdHloPogJdWu8ELEt10-qKgWBX9DKM';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let supabase = null;
+try {
+  if (window.supabase && window.supabase.createClient) {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+} catch(e) { console.log('Supabase SDK未加载，使用本地存储模式'); }
 
 // ===========================
 // LOCK SCREEN (password gate)
