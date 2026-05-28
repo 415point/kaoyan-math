@@ -1117,65 +1117,27 @@ function getDefaults() {
   };
 }
 
-function hasSupabase() {
-  return typeof supabase !== 'undefined' && supabase && supabase.from;
+function saveState(s) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
 }
 
-async function loadState() {
-  // 1. Try Supabase cloud (with 3s timeout)
-  if (hasSupabase()) {
-    try {
-      const result = await Promise.race([
-        supabase.from('app_data').select('data').eq('id', 'main').single(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
-      ]);
-      const { data, error } = result;
-      if (!error && data && data.data && Object.keys(data.data).length > 0) {
-        const merged = { ...getDefaults(), ...data.data };
-        if ((merged.plan808Version || 0) < PLAN808_VERSION) {
-          merged.plan808 = DEFAULT_PLAN_808;
-          merged.plan808Version = PLAN808_VERSION;
-        }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-        return merged;
-      }
-    } catch(e) { console.log('Supabase不可用，使用本地存储'); }
-  }
-  // 2. Fall back to localStorage
+let state = getDefaults();
+
+// Load from localStorage on startup
+(function initState() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) {
     try {
-      const local = { ...getDefaults(), ...JSON.parse(raw) };
-      if ((local.plan808Version || 0) < PLAN808_VERSION) {
-        local.plan808 = DEFAULT_PLAN_808;
-        local.plan808Version = PLAN808_VERSION;
-      }
-      // Migrate to Supabase (fire and forget)
-      if (hasSupabase()) {
-        supabase.from('app_data').upsert({ id: 'main', data: local, updated_at: new Date().toISOString() }).then(() => {});
-      }
-      return local;
+      const local = JSON.parse(raw);
+      state = { ...getDefaults(), ...local };
     } catch(e) {}
   }
-
-  // 3. Use defaults
-  return getDefaults();
-}
-
-function saveState(state) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  if (hasSupabase()) {
-    supabase.from('app_data').upsert({ id: 'main', data: state, updated_at: new Date().toISOString() }).then(() => {});
+  if ((state.plan808Version || 0) < PLAN808_VERSION) {
+    state.plan808 = DEFAULT_PLAN_808;
+    state.plan808Version = PLAN808_VERSION;
   }
-}
-
-let state = null;
-
-async function bootApp() {
-  state = await loadState();
   saveState(state);
-  startApp();
-}
+})();
 
 // Generate unique IDs for each knowledge point
 function pointId(sectionId, chapterId, pointIndex) {
@@ -2588,7 +2550,7 @@ console.log(`错题数: ${state.wrongQuestions.length}`);
 console.log('目标: 厦门大学会计学学硕 405+');
 
 // Boot after all functions defined
-bootApp();
+startApp();
 </script>
 </body>
 </html>
